@@ -1,0 +1,77 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "hugo-base: keep Hugo and Go pinned identically in mise.toml, netlify.toml and GitHub workflows, one grouped PR per release. Extend this preset unchanged from any hugo-base site.",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Hugo version in mise.toml, netlify.toml and workflow env",
+      "managerFilePatterns": [
+        "/(^|/)\\.?mise\\.toml$/",
+        "/(^|/)netlify\\.toml$/",
+        "/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "(^|\\n)[ \\t]*\"?(?:aqua:gohugoio/hugo[^\"\\s=]*|hugo|hugo-extended)\"?[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"",
+        "(^|\\n)[ \\t]*HUGO_VERSION[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"",
+        "(^|\\n)[ \\t]*HUGO_VERSION:[ \\t]*[\"']?(?<currentValue>[0-9][^\"'\\s]*)[\"']?"
+      ],
+      "depNameTemplate": "gohugoio/hugo",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "Go version in mise.toml, netlify.toml and workflow env",
+      "managerFilePatterns": [
+        "/(^|/)\\.?mise\\.toml$/",
+        "/(^|/)netlify\\.toml$/",
+        "/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "(^|\\n)[ \\t]*\"?go\"?[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"",
+        "(^|\\n)[ \\t]*GO_VERSION[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"",
+        "(^|\\n)[ \\t]*GO_VERSION:[ \\t]*[\"']?(?<currentValue>[0-9][^\"'\\s]*)[\"']?"
+      ],
+      "depNameTemplate": "go",
+      "datasourceTemplate": "golang-version",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "The regex managers above own Hugo and Go in mise.toml. Stop the mise manager from opening competing PRs for the same lines.",
+      "matchManagers": ["mise"],
+      "matchDepNames": ["go", "hugo", "hugo-extended", "aqua:gohugoio/hugo/hugo-extended", "aqua:gohugoio/hugo"],
+      "enabled": false
+    },
+    {
+      "description": "The go directive in go.mod is a minimum version, not a toolchain pin. Leave it alone.",
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["golang", "toolchain"],
+      "enabled": false
+    },
+    {
+      "description": "One PR per Hugo release, covering every file that pins it.",
+      "matchDepNames": ["gohugoio/hugo"],
+      "groupName": "Hugo",
+      "separateMajorMinor": false,
+      "separateMinorPatch": false
+    },
+    {
+      "description": "One PR per Go release, covering every file that pins it.",
+      "matchDepNames": ["go"],
+      "matchManagers": ["custom.regex"],
+      "groupName": "Go",
+      "separateMajorMinor": false,
+      "separateMinorPatch": false
+    },
+    {
+      "description": "Move the hugo-base module and its reusable CI workflow together. Never run go mod tidy: there is no Go code, so it would drop the requirement.",
+      "matchPackageNames": ["github.com/bradryanbice/hugo-base", "bradryanbice/hugo-base"],
+      "groupName": "hugo-base",
+      "separateMajorMinor": false,
+      "separateMinorPatch": false
+    }
+  ]
+}

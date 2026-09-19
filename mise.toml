@@ -4,3 +4,6 @@
 [tools]
 "aqua:gohugoio/hugo/hugo-extended" = "0.166.0"
 go = "1.27.1"
+# CI tooling only (Renovate validator, and later axe and Lighthouse).
+# Never part of the site build.
+node = "24.21.0"

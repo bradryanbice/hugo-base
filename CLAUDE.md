@@ -114,6 +114,7 @@ Rules:
 CI builds `exampleSite` with `hugo build --gc --minify --panicOnWarning`, fails on deprecation notices, lints prose for dashes, checks version drift, then runs axe and Lighthouse CI against the built output. This gate is what makes automated Hugo bumps safe.
 
 - A change that is not exercised by `exampleSite` is not tested. Every layout, partial, shortcode, and render hook must be rendered by at least one exampleSite page.
+- The gate is `.github/workflows/site-ci.yml`, a reusable workflow. It installs the toolchain from the caller's `mise.toml` and runs the scripts in `tools/ci/` from the hugo-base version the caller pins, located with `hugo config mounts`. Scripts there must stay bash 3.2 compatible (macOS) and must not assume they run inside the hugo-base repo.
 - The gate must be proven to fail. Keep the negative fixture that CI uses to confirm axe catches a known violation.
 
 ## Common commands
@@ -121,8 +122,12 @@ CI builds `exampleSite` with `hugo build --gc --minify --panicOnWarning`, fails 
 ```sh
 mise install                                   # install pinned Hugo and Go
 hugo server --source exampleSite               # local dev against the base
-hugo build --source exampleSite --gc --minify --panicOnWarning
 hugo mod graph --source exampleSite            # confirm the module resolves
+
+# The same checks CI runs (tools/ci/ is shared with consuming sites):
+bash tools/ci/check-versions.sh                # Hugo and Go pins agree
+bash tools/ci/lint-dashes.sh                   # no en or em dashes
+bash tools/ci/build.sh exampleSite             # strict build, fails on deprecations
 ```
 
 ## Working agreements for Claude

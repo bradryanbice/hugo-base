@@ -1,0 +1,94 @@
+# Reusable CI gate for hugo-base and every site that consumes it.
+#
+# A site calls it with a short workflow:
+#
+#   jobs:
+#     site:
+#       uses: bradryanbice/hugo-base/.github/workflows/site-ci.yml@vX.Y.Z
+#
+# The workflow carries no Hugo version. The toolchain comes from the caller's
+# mise.toml, and the check scripts come from the hugo-base version the caller
+# pins in go.mod, so checks always match the base the site actually uses.
+
+name: Site CI
+
+on:
+  workflow_call:
+    inputs:
+      source:
+        description: Path of the Hugo project, relative to the repository root.
+        type: string
+        default: "."
+      lint-dashes:
+        description: Fail on en or em dashes in any tracked text file.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    env:
+      SOURCE: ${{ inputs.source }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v7
+
+      - name: Install toolchain from mise.toml
+        uses: jdx/mise-action@v4
+        with:
+          install: true
+          cache: true
+
+      - name: Restore Hugo cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/hugo_cache
+          key: hugo-${{ runner.os }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-${{ github.run_id }}
+          restore-keys: |
+            hugo-${{ runner.os }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-
+            hugo-${{ runner.os }}-
+
+      - name: Locate hugo-base
+        id: base
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+        run: |
+          # hugo config mounts prints one JSON object per module, including its
+          # directory on disk. hugo-base is the one whose go.mod declares it.
+          base=""
+          for dir in $(hugo config mounts --source "$SOURCE" | jq -r 'select(.dir) | .dir'); do
+            if grep -qx 'module github.com/bradryanbice/hugo-base' "$dir/go.mod" 2>/dev/null; then
+              base="${dir%/}"
+              break
+            fi
+          done
+          if [ -z "$base" ]; then
+            echo "::error::could not locate the hugo-base module from $SOURCE"
+            exit 1
+          fi
+          echo "hugo-base found at $base"
+          echo "dir=$base" >> "$GITHUB_OUTPUT"
+
+      - name: Check version drift
+        run: bash "${{ steps.base.outputs.dir }}/tools/ci/check-versions.sh" .
+
+      - name: Lint for en and em dashes
+        if: inputs.lint-dashes
+        run: bash "${{ steps.base.outputs.dir }}/tools/ci/lint-dashes.sh"
+
+      - name: Build
+        env:
+          HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+        run: bash "${{ steps.base.outputs.dir }}/tools/ci/build.sh" "$SOURCE"
+
+      - name: Upload built site
+        uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: ${{ inputs.source }}/public
+          if-no-files-found: error
+          retention-days: 7

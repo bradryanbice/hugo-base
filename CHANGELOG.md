@@ -13,3 +13,5 @@ release may contain breaking changes, listed under a Breaking heading.
 - `exampleSite` test harness importing the module from the local checkout.
 - Hugo version pinned in `mise.toml` and `netlify.toml`.
 - MIT license.
+- Reusable CI gate `.github/workflows/site-ci.yml` for hugo-base and consuming sites: toolchain from `mise.toml`, Hugo and Go version drift check, optional dash lint, strict build that fails on warnings and deprecations, built site uploaded as an artifact.
+- `tools/ci/` scripts behind the gate, runnable locally.

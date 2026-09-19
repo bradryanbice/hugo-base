@@ -77,8 +77,10 @@ done
 if command -v hugo >/dev/null 2>&1; then
   installed=$(hugo version)
   echo "installed       $installed"
+  # Official release builds print "v0.166.0-<commit>+extended", Homebrew
+  # builds print "v0.166.0+extended". Accept either.
   case "$installed" in
-    "hugo v$mise_hugo+"* | "hugo v$mise_hugo "*) ;;
+    "hugo v$mise_hugo-"* | "hugo v$mise_hugo+"* | "hugo v$mise_hugo "*) ;;
     *) fail "installed Hugo is not v$mise_hugo: $installed" ;;
   esac
   case "$mise_hugo_key" in

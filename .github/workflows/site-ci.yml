@@ -20,6 +20,8 @@ on:
         type: string
         default: "."
       lint-dashes:
+        # Off for consuming sites by decision: it would scan their content,
+        # which is the site author's own prose. hugo-base turns it on.
         description: Fail on en or em dashes in any tracked text file.
         type: boolean
         default: false

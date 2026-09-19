@@ -24,5 +24,27 @@ hugo build --source exampleSite --gc --minify --panicOnWarning
 `exampleSite/` is the test harness. It imports this module from the local
 checkout, so changes show up immediately.
 
+## Renovate
+
+`renovate/hugo.json` is a shared preset. It keeps the Hugo and Go versions in
+`mise.toml`, `netlify.toml` and any workflow `HUGO_VERSION` or `GO_VERSION`
+identical, and opens one grouped PR per release. It also groups a site's
+hugo-base module bump with its reusable CI workflow ref.
+
+A site uses it by adding this to its `renovate.json`:
+
+```json
+{
+  "extends": ["config:recommended", "github>bradryanbice/hugo-base//renovate/hugo"]
+}
+```
+
+Extending by reference (recommended) means fixes to the preset reach every
+site immediately. Copying `renovate/hugo.json` into a site also works, because
+it contains nothing specific to this repo, but copies drift.
+
+Never enable Renovate's `gomodTidy` option in a hugo-base site. There is no Go
+code, so `go mod tidy` would remove the hugo-base requirement.
+
 Consumer documentation (importing, overriding, theming, updating) arrives
 before v0.1.0.

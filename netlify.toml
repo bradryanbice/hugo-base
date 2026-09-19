@@ -1,0 +1,14 @@
+# Deploys exampleSite so every hugo-base PR gets a browsable preview.
+# HUGO_VERSION must match mise.toml and CI. Renovate bumps them together.
+
+[build]
+  publish = "exampleSite/public"
+  command = """
+    git config --global core.quotepath false && \
+    hugo build --source exampleSite --gc --minify --panicOnWarning --baseURL "${DEPLOY_PRIME_URL}/"
+  """
+
+[build.environment]
+  HUGO_VERSION = "0.166.0"
+  GO_VERSION = "1.27.1"
+  TZ = "UTC"

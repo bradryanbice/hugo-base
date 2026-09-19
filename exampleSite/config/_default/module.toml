@@ -1,0 +1,7 @@
+# Import hugo-base from this checkout rather than from GitHub.
+# The replacement path is resolved relative to themesDir (exampleSite/themes),
+# so "../.." points at the repository root.
+replacements = "github.com/bradryanbice/hugo-base -> ../.."
+
+[[imports]]
+  path = "github.com/bradryanbice/hugo-base"

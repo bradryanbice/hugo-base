@@ -1,0 +1,6 @@
+# exampleSite is the test harness for hugo-base. Its config/_default/ layout
+# mirrors what hugo-starter will ship to new sites.
+
+baseURL = "https://example.org/"
+locale = "en-US"
+title = "hugo-base example"

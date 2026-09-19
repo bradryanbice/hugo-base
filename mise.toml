@@ -1,0 +1,6 @@
+# Local toolchain. The Hugo version here must match netlify.toml and CI.
+# Renovate bumps all of them together in one PR.
+
+[tools]
+"aqua:gohugoio/hugo/hugo-extended" = "0.166.0"
+go = "1.27.1"

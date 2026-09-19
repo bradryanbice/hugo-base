@@ -1,0 +1,12 @@
+# Module configuration for hugo-base.
+#
+# Keep this file small. Most configuration categories do not merge from a
+# module into the consuming site (only params, menus, mediaTypes and
+# outputFormats do), so site configuration belongs in each site.
+#
+# Do not add module.mounts here. Declaring any mount removes every default
+# mount for this module.
+
+[module.hugoVersion]
+  # The lowest Hugo version CI has tested. Raise it deliberately.
+  min = "0.166.0"

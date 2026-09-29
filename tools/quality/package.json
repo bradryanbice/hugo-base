@@ -1,0 +1,12 @@
+{
+  "name": "hugo-base-quality",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accessibility and Lighthouse gate for hugo-base and the sites that consume it. CI tooling only: it never touches a site build.",
+  "type": "module",
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@lhci/cli": "0.15.1",
+    "playwright-core": "1.63.0"
+  }
+}

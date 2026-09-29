@@ -94,3 +94,26 @@ jobs:
           path: ${{ inputs.source }}/public
           if-no-files-found: error
           retention-days: 7
+
+      - name: Cache npm downloads for the quality tooling
+        uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-${{ github.run_id }}
+          restore-keys: |
+            npm-${{ runner.os }}-${{ hashFiles('**/go.sum', '**/go.mod') }}-
+            npm-${{ runner.os }}-
+
+      - name: Accessibility and Lighthouse
+        env:
+          REPORT_DIR: ${{ runner.temp }}/quality-reports
+        run: bash "${{ steps.base.outputs.dir }}/tools/quality/run.sh" "$SOURCE/public"
+
+      - name: Upload quality reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-reports
+          path: ${{ runner.temp }}/quality-reports
+          if-no-files-found: ignore
+          retention-days: 7

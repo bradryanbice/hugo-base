@@ -24,6 +24,19 @@ hugo build --source exampleSite --gc --minify --panicOnWarning
 `exampleSite/` is the test harness. It imports this module from the local
 checkout, so changes show up immediately.
 
+## Quality gate
+
+```sh
+bash tools/quality/run.sh exampleSite/public
+```
+
+This serves the built site, runs axe over every URL in its sitemap (WCAG 2.0,
+2.1 and 2.2 A and AA), runs Lighthouse CI against the assertions in
+`tools/quality/lighthouserc.json`, and then self tests by requiring axe to
+fail on a deliberately broken page. Chrome comes from the machine, so no
+browser is downloaded. Consuming sites get the same gate through the reusable
+workflow, which is where a site's own brand colors get checked for contrast.
+
 ## Renovate
 
 `renovate/hugo.json` is a shared preset. It keeps the Hugo and Go versions in

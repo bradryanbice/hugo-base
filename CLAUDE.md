@@ -115,7 +115,8 @@ CI builds `exampleSite` with `hugo build --gc --minify --panicOnWarning`, fails 
 
 - A change that is not exercised by `exampleSite` is not tested. Every layout, partial, shortcode, and render hook must be rendered by at least one exampleSite page.
 - The gate is `.github/workflows/site-ci.yml`, a reusable workflow. It installs the toolchain from the caller's `mise.toml` and runs the scripts in `tools/ci/` from the hugo-base version the caller pins, located with `hugo config mounts`. Scripts there must stay bash 3.2 compatible (macOS) and must not assume they run inside the hugo-base repo.
-- The gate must be proven to fail. Keep the negative fixture that CI uses to confirm axe catches a known violation.
+- The gate must be proven to fail. `tools/quality/fixtures/violation.html` is deliberately broken and the gate asserts that axe fails on it. Never fix that file.
+- Lighthouse thresholds live in `tools/quality/lighthouserc.json`. Accessibility must stay at 1. Raise a threshold when the code improves, never lower one to get a PR green.
 
 ## Common commands
 
@@ -128,6 +129,7 @@ hugo mod graph --source exampleSite            # confirm the module resolves
 bash tools/ci/check-versions.sh                # Hugo and Go pins agree
 bash tools/ci/lint-dashes.sh                   # no en or em dashes
 bash tools/ci/build.sh exampleSite             # strict build, fails on deprecations
+bash tools/quality/run.sh exampleSite/public   # axe, Lighthouse, and the gate self test
 ```
 
 ## Working agreements for Claude

@@ -17,3 +17,5 @@ release may contain breaking changes, listed under a Breaking heading.
 - `tools/ci/` scripts behind the gate, runnable locally.
 - Shared Renovate preset `renovate/hugo.json`: one grouped PR per Hugo release and per Go release across `mise.toml`, `netlify.toml` and workflows, and hugo-base module plus CI workflow bumps grouped together. Validated in CI.
 - Node pinned in `mise.toml` for CI tooling.
+- Accessibility and Lighthouse gate in `tools/quality/`: axe over every sitemap URL, Lighthouse CI assertions (accessibility must score 1, byte budgets are hard limits, performance is a warning), reports uploaded as an artifact, and a self test that proves axe still fails on a broken page.
+- Pull request template with a manual accessibility checklist.

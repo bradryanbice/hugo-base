@@ -1,0 +1,23 @@
+<!doctype html>
+<!--
+  Deliberately broken page. The quality gate serves this and asserts that axe
+  fails on it, which proves the gate can still catch a regression. Do not fix
+  the problems below: an image with no alt text, a heading level skip, a form
+  control with no label, and text with too little contrast.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quality gate self test</title>
+</head>
+<body>
+  <main>
+    <h1>Self test</h1>
+    <h3>Skipped heading level</h3>
+    <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+    <p style="color: oklch(0.85 0 0); background: oklch(0.95 0 0)">Low contrast text.</p>
+    <input type="text">
+  </main>
+</body>
+</html>

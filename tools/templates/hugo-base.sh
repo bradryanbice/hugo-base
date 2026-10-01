@@ -56,7 +56,7 @@ case "$command" in
     ;;
   lint)
     if [ -f "$base/tools/lint/run.sh" ]; then
-      bash "$base/tools/lint/run.sh" . "$@"
+      bash "$base/tools/lint/run.sh" "$@" .
     else
       echo "error: this hugo-base version does not ship the CSS policy lint yet." >&2
       exit 1

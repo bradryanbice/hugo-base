@@ -86,6 +86,28 @@ specificity fights. Add it through the `head/css-site.html` partial.
   scrolling. Long words, URLs and identifiers need `overflow-wrap`, or the
   `.wrap-anywhere` utility.
 
+## What CI enforces
+
+These are not style suggestions. `./hugo-base.sh lint` runs them locally and
+the gate runs them on every pull request:
+
+- no hex, named, `rgb()`, `hsl()`, `hwb()`, `lab()`, `lch()` or `color-mix()`
+  values, so every color is `oklch()`
+- color, background, margin, padding, gap, inset, border radius and z-index
+  must come from a token, a keyword, or an `em` value (which is relative to the
+  element's own text)
+- no `!important`
+- no `outline: none` or `outline: 0`
+- logical properties instead of physical ones
+- no `@import` outside `main.css`
+- no primitive ramp step (`var(--neutral-700)`, `var(--accent-500)`) outside
+  the token files
+- no site copy of a foundation file
+
+A genuine exception is taken with a `stylelint-disable-next-line` comment
+directly above the declaration, naming the rule, with a reason. The base has
+four, each explained in place.
+
 ## Contrast is checked, in both schemes
 
 The quality gate runs axe over every page and separately checks every semantic

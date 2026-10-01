@@ -35,3 +35,16 @@ target = ".editorconfig"
 source = "tools/templates/hugo-base.sh"
 target = "hugo-base.sh"
 mode = "755"
+
+# Foundation paths a consuming site must not shadow. The CSS policy lint fails
+# when a site has its own copy, because overriding these breaks the design
+# system rather than theming it. Theming happens in tokens/theme.css.
+[protected]
+paths = [
+  "assets/css/main.css",
+  "assets/css/tokens/scale.css",
+  "assets/css/tokens/color.css",
+  "assets/css/tokens/semantic.css",
+  "assets/css/foundation/**",
+  "assets/css/layout/primitives.css",
+]

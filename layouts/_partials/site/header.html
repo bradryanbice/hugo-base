@@ -1,0 +1,15 @@
+{{- /* The banner landmark: the brand link and the main navigation.
+
+One link wraps the logo seam and the site title, so a screen reader announces a
+single "home" link rather than two. Navigation content comes entirely from the
+site's menu config. */ -}}
+<header class="site-header">
+  <div class="site-header__inner center">
+    <a class="site-header__brand" href="{{ site.Home.RelPermalink }}">
+      {{- partial "site/logo.html" . -}}
+      <span class="site-header__title">{{ site.Title }}</span>
+    </a>
+    {{ partial "site/nav.html" (dict "menuID" "main" "page" . "label" (i18n "mainNavigation")) }}
+    {{ partial "hooks/header-end.html" . }}
+  </div>
+</header>

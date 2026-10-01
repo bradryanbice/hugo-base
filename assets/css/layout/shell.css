@@ -1,0 +1,145 @@
+/* The page shell: skip link, header, navigation and footer.
+ *
+ * No JavaScript and no viewport breakpoints. The header is a container query
+ * context, so it rearranges based on the space it actually has, and the
+ * navigation wraps rather than collapsing behind a toggle that would need JS.
+ *
+ * Foundation file. A site must not override it. */
+
+/* Off screen until focused, then over everything else. */
+.skip-link {
+  position: absolute;
+  inset-block-start: var(--space-1);
+  inset-inline-start: var(--space-1);
+  z-index: var(--layer-skip-link);
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-surface-raised);
+  color: var(--color-text);
+  border: var(--border-thin) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  text-decoration-line: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.site-header {
+  container-type: inline-size;
+  border-block-end: var(--border-thin) solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  padding-block: var(--space-2);
+}
+
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text);
+  font-weight: var(--weight-bold);
+  text-decoration-line: none;
+}
+
+.site-header__brand:visited {
+  color: var(--color-text);
+}
+
+.site-header__brand:hover .site-header__title {
+  text-decoration-line: underline;
+  text-decoration-thickness: max(0.08em, 1px);
+}
+
+.site-header__title {
+  font-size: var(--text-md);
+  font-family: var(--font-heading, var(--font-body, var(--font-stack-system)));
+}
+
+/* When the header has little room, the brand and the navigation stack and the
+ * navigation starts at the inline edge rather than the far side. */
+@container (max-width: 34rem) {
+  .site-header__inner {
+    justify-content: flex-start;
+  }
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-0h) var(--space-3);
+  padding-inline-start: 0;
+  margin-block: 0;
+}
+
+/* The element spacing from typography does not apply to a row of links. */
+.site-nav__item + .site-nav__item {
+  margin-block-start: 0;
+}
+
+.site-nav a {
+  color: var(--color-text);
+  text-decoration-line: none;
+  padding-block: var(--space-0h);
+}
+
+.site-nav a:visited {
+  color: var(--color-text);
+}
+
+.site-nav a:hover {
+  color: var(--color-link-hover);
+  text-decoration-line: underline;
+}
+
+/* The page you are on, and the section it sits in, are both marked in the
+ * markup. Weight and an underline carry it visually, so the cue is not color
+ * alone. */
+.site-nav a[aria-current="page"] {
+  font-weight: var(--weight-bold);
+  text-decoration-line: underline;
+  text-decoration-thickness: max(0.12em, 2px);
+  text-underline-offset: 0.3em;
+}
+
+.site-nav a[aria-current="true"] {
+  font-weight: var(--weight-medium);
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.3em;
+}
+
+/* A grouping entry with no link of its own. */
+.site-nav__group {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+}
+
+/* A nested level is indented and set slightly smaller. */
+.site-nav__list .site-nav__list {
+  flex-basis: 100%;
+  padding-inline-start: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.site-footer {
+  margin-block-start: var(--space-8);
+  border-block-start: var(--border-thin) solid var(--color-border);
+  background-color: var(--color-surface-raised);
+}
+
+.site-footer__inner {
+  padding-block: var(--space-4);
+}
+
+.site-footer__copyright {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

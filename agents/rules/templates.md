@@ -40,8 +40,26 @@ Other version facts worth remembering:
   `layouts/players/single.html`. Do not copy a shared template to make a small
   change.
 - Extend the page shell through the empty hook partials in
-  `layouts/_partials/hooks/` (head end, body start, body end, header end,
-  footer start). Analytics and third party snippets go there.
+  `layouts/_partials/hooks/`. These names are part of the base's public API:
+
+  | Hook | Where it renders |
+  |---|---|
+  | `head-end.html` | end of `<head>` |
+  | `body-start.html` | start of `<body>`, before the skip link. Keep it free of focusable elements, or they land ahead of the skip link |
+  | `header-end.html` | end of the header, after the navigation |
+  | `footer-start.html` | start of the footer |
+  | `body-end.html` | end of `<body>`, for deferred scripts |
+
+- The other seams in the shell: `site/logo.html` (renders inside the brand
+  link, so give the image an empty alt), `head/css-site.html` for a site
+  stylesheet, and any single `site/*` or `head/*` partial.
+- Navigation is content, so it lives in the site's menu config. The base
+  renders `main` and `footer` menus and renders nothing when they are absent.
+  Define menu entries with `pageRef`, and use an entry without a URL only as a
+  grouping label: the base renders those as text, never as an empty link.
+- The current page's menu entry gets `aria-current="page"` and the entry for
+  the section containing it gets `aria-current="true"`. Both are also marked
+  visually, never by color alone.
 - Every user visible string comes from `i18n/`, so a site can reword without
   touching a template.
 - Replacing a single sub partial (for example `head/social.html`) is supported.

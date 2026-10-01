@@ -4,3 +4,4 @@
 baseURL = "https://example.org/"
 locale = "en-US"
 title = "hugo-base example"
+copyright = "Example site for hugo-base. MIT licensed."

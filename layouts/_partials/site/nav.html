@@ -1,0 +1,19 @@
+{{- /* Renders a menu the site has defined, and nothing at all when it has not.
+
+Context: a dict with
+  menuID  the menu to render, for example "main"
+  page    the current page, for active state
+  label   the accessible name for the <nav> landmark
+
+The base ships no menu entries. Menu config merges shallowly from a module, so
+any entry defined here would appear in every site. */ -}}
+
+{{- $menuID := .menuID -}}
+{{- $page := .page -}}
+{{- $label := .label -}}
+
+{{- with index site.Menus $menuID -}}
+  <nav class="site-nav" aria-label="{{ $label }}">
+    {{- partial "site/menu-items.html" (dict "items" . "menuID" $menuID "page" $page) -}}
+  </nav>
+{{- end -}}

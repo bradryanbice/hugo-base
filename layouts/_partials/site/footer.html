@@ -1,0 +1,13 @@
+{{- /* The contentinfo landmark: an optional footer menu and the copyright line.
+
+Both are site owned. With neither configured the footer renders empty, which is
+still correct: one contentinfo landmark per page. */ -}}
+<footer class="site-footer">
+  <div class="site-footer__inner center stack">
+    {{ partial "hooks/footer-start.html" . }}
+    {{ partial "site/nav.html" (dict "menuID" "footer" "page" . "label" (i18n "footerNavigation")) }}
+    {{ with site.Copyright }}
+      <p class="site-footer__copyright">{{ . | markdownify }}</p>
+    {{ end }}
+  </div>
+</footer>

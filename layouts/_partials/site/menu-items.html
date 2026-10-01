@@ -1,0 +1,36 @@
+{{- /* One level of a menu, calling itself for children.
+
+Context: a dict with items, menuID and page.
+
+Active state follows the two standard cases: the entry for the page you are on
+gets aria-current="page", and an entry whose section contains that page gets
+aria-current="true". Screen readers announce the first as the current page and
+the second as current within a set, which is the distinction a reader needs.
+
+An entry with no URL (a parent used only for grouping) renders as text rather
+than as a link, because a link to nowhere is a trap for keyboard and screen
+reader users. */ -}}
+
+{{- $menuID := .menuID -}}
+{{- $page := .page -}}
+
+<ul role="list" class="site-nav__list">
+  {{- range $entry := .items }}
+    {{- $current := "" -}}
+    {{- if $page.IsMenuCurrent $menuID $entry -}}
+      {{- $current = "page" -}}
+    {{- else if $page.HasMenuCurrent $menuID $entry -}}
+      {{- $current = "true" -}}
+    {{- end }}
+    <li class="site-nav__item">
+      {{- if $entry.URL }}
+        <a href="{{ $entry.URL }}"{{ with $current }} aria-current="{{ . }}"{{ end }}>{{ $entry.Name }}</a>
+      {{- else }}
+        <span class="site-nav__group">{{ $entry.Name }}</span>
+      {{- end }}
+      {{- with $entry.Children }}
+        {{- partial "site/menu-items.html" (dict "items" . "menuID" $menuID "page" $page) }}
+      {{- end }}
+    </li>
+  {{- end }}
+</ul>

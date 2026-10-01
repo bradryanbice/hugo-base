@@ -1,0 +1,4 @@
+{{- /* The first focusable element on the page. It is off screen until focused,
+then appears over the header. The target is <main id="main" tabindex="-1">, and
+the tabindex is what makes browsers move focus rather than only scrolling. */ -}}
+<a class="skip-link" href="#main">{{ i18n "skipToContent" }}</a>

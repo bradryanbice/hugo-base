@@ -1,0 +1,6 @@
+# User visible strings in the base. A site changes any of these by adding its
+# own i18n/en.toml with that key, without touching a template.
+
+skipToContent = "Skip to content"
+mainNavigation = "Main"
+footerNavigation = "Footer"

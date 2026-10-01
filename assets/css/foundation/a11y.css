@@ -6,8 +6,13 @@
 
 /* One focus style for everything. Two pixels at an offset, so the ring sits
  * outside the control and does not depend on the control's own background,
- * which is what keeps it at 3:1 in both schemes (WCAG 2.2 SC 2.4.13). */
-:focus-visible {
+ * which is what keeps it at 3:1 in both schemes (WCAG 2.2 SC 2.4.13).
+ *
+ * Elements with tabindex="-1" are excluded. They are containers that receive
+ * focus programmatically, such as <main> after the skip link, not controls the
+ * user tabbed to, so a ring around the whole region would be noise. Every
+ * element a keyboard can reach still gets one. */
+:focus-visible:not([tabindex="-1"]) {
   outline: var(--focus-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-offset);
   border-radius: var(--radius-sm);

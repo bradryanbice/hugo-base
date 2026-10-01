@@ -1,0 +1,6 @@
+{{- /* Overrides the base's empty hook, to prove the seam works. A real site
+would put analytics or another deferred script here.
+
+A hidden element rather than an HTML comment: the production build minifies and
+strips comments, so a comment could not be asserted on. */ -}}
+<div hidden data-hugo-base-hook="body-end"></div>

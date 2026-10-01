@@ -32,3 +32,4 @@
 @import "foundation/print.css" layer(foundation);
 
 @import "layout/primitives.css" layer(layout);
+@import "layout/shell.css" layer(layout);

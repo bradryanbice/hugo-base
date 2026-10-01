@@ -6,10 +6,18 @@
   <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
   {{ partial "head/css.html" . }}
   {{ partial "head/css-site.html" . }}
+  {{ partial "hooks/head-end.html" . }}
 </head>
 <body>
+  {{ partial "hooks/body-start.html" . }}
+  {{ partial "site/skip-link.html" . }}
+  {{ partial "site/header.html" . }}
+  {{/* tabindex="-1" so the skip link moves focus here, not just the scroll
+       position. One main landmark per page. */}}
   <main id="main" tabindex="-1">
     {{ block "main" . }}{{ end }}
   </main>
+  {{ partial "site/footer.html" . }}
+  {{ partial "hooks/body-end.html" . }}
 </body>
 </html>

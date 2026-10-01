@@ -1,0 +1,34 @@
+# Menu content belongs to the site. The base renders whatever is here and
+# nothing when a menu is absent. The nested entry under "Reference" exercises
+# the recursive rendering and the grouping entry that has no link of its own.
+
+[[main]]
+  name = "About"
+  pageRef = "/about"
+  weight = 10
+
+[[main]]
+  name = "Typography"
+  pageRef = "/typography"
+  weight = 20
+
+[[main]]
+  name = "Notes"
+  pageRef = "/notes"
+  weight = 25
+
+[[main]]
+  identifier = "reference"
+  name = "Reference"
+  weight = 30
+
+[[main]]
+  name = "Foundation"
+  pageRef = "/foundation"
+  parent = "reference"
+  weight = 10
+
+[[footer]]
+  name = "Hugo"
+  url = "https://gohugo.io/"
+  weight = 10

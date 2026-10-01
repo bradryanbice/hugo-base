@@ -28,5 +28,8 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Page shell: `baseof.html` with one banner, main and contentinfo landmark per page, a skip link that moves focus into `<main>`, a header with a brand link and a logo seam, a recursive nav that renders only menus the site defines, and a footer with an optional menu and copyright line.
+- Five hook partials (`head-end`, `body-start`, `header-end`, `footer-start`, `body-end`) as the shell's extension API, plus `i18n/en.toml` for every user visible string.
+- `layout/shell.css`: skip link, header, nav and footer, arranged with a container query and no JavaScript.
 - CSS policy lint in `tools/lint/`: OKLCH only, tokens for spacing and color, no `!important`, no focus removal, logical properties, no stray `@import`, no primitive ramp steps outside the token files, and no site copy of a foundation file. Runs in CI and through `./hugo-base.sh lint`, with a broken fixture that proves every rule still fires.
 - The quality gate now runs axe in both light and dark mode, and checks every semantic color pair in the token contract for contrast and for tokens that fail to resolve.

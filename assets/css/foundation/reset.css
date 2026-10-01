@@ -1,0 +1,83 @@
+/* A small reset. It removes surprises, not semantics: list markers, focus
+ * outlines and heading levels all stay meaningful.
+ *
+ * Foundation file. A site must not override it. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Margins come from the layout primitives and typography, not from defaults. */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd,
+pre {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding-inline-start: 0;
+  margin-block: 0;
+}
+
+/* Only lists that are being used as layout lose their markers, and they say so
+ * with role="list" so assistive technology still reports a list. */
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+/* Form controls inherit type instead of falling back to a system font. */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+textarea:not([rows]) {
+  min-block-size: 10lh;
+}
+
+table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+:target {
+  scroll-margin-block-start: var(--space-4);
+}
+
+[hidden] {
+  display: none !important; /* The one exception: hidden must always win. */
+}

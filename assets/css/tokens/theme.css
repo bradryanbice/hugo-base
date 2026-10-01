@@ -1,0 +1,51 @@
+/* Theme inputs: the one file a site overrides.
+ *
+ * This file is intentionally empty of declarations. Every input below is read
+ * where it is used with its default as a var() fallback, so a site sets only
+ * what it wants to change and anything it leaves out keeps the default. That
+ * also means a partial override can never invalidate a token.
+ *
+ * To theme a site, create assets/css/tokens/theme.css in the site and declare
+ * the inputs you want on :root. Nothing else needs to change: ramps, hover and
+ * active states, dark mode and elevation are all derived.
+ *
+ * Color
+ *   --accent-hue       0 to 360, OKLCH hue. Default 250.
+ *   --accent-chroma    0 is grey, about 0.12 to 0.2 is a saturated brand
+ *                      color. Default 0, so hugo-base ships no brand color.
+ *   --neutral-hue      Hue of surfaces and text. Defaults to --accent-hue.
+ *   --neutral-chroma   Tints greys toward the brand. Keep under about 0.02.
+ *                      Default 0.
+ *   --status-chroma    Shared chroma for the status colors. Default 0.11.
+ *   --info-hue         Default 245.
+ *   --success-hue      Default 150.
+ *   --warning-hue      Default 85.
+ *   --danger-hue       Default 25.
+ *
+ * High chroma cannot hold at the light and dark ends of a ramp, so the ramps
+ * taper it. If one step still looks wrong for your hue, override that single
+ * step (for example --accent-700) here rather than editing the foundation.
+ *
+ * Type
+ *   --font-body        Default a system font stack.
+ *   --font-heading     Defaults to --font-body.
+ *   --font-mono        Default a system monospace stack.
+ *
+ * Shape and depth
+ *   --radius-scale     Multiplier on the radius steps. 0 is square, 1 is the
+ *                      default, 2 is softer.
+ *   --shadow-strength  Multiplier on shadow opacity. 0 is flat, 1 is default.
+ *
+ * Example site theme:
+ *
+ *   :root {
+ *     --accent-hue: 25;
+ *     --accent-chroma: 0.15;
+ *     --neutral-chroma: 0.006;
+ *     --radius-scale: 0;
+ *   }
+ *
+ * Contrast is the site's responsibility once it sets these. The quality gate
+ * checks every semantic pair in both light and dark mode against the built
+ * site, so a brand color that breaks contrast fails CI.
+ */

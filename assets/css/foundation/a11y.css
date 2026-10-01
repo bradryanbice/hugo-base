@@ -1,0 +1,84 @@
+/* Accessibility primitives that every site depends on: the focus ring, the
+ * visually hidden utility, and support for the display preferences people set
+ * in their operating system.
+ *
+ * Foundation file. A site must not override it. */
+
+/* One focus style for everything. Two pixels at an offset, so the ring sits
+ * outside the control and does not depend on the control's own background,
+ * which is what keeps it at 3:1 in both schemes (WCAG 2.2 SC 2.4.13). */
+:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* Browsers that support :focus-visible should not also draw the old ring. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Available to assistive technology, not shown on screen. */
+.visually-hidden {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Visible once focused, which is how the skip link works. */
+.visually-hidden-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* WCAG 2.2 SC 2.5.8 asks for targets of at least 24 by 24 CSS pixels. Links
+ * inside a sentence are explicitly exempt, but a link that is the entire
+ * content of a list item is a standalone target, so it gets a minimum height
+ * and enough spacing that neighbouring targets do not crowd it. This covers
+ * navigation, page lists and link lists without each component repeating it. */
+:is(nav, ul, ol) li > a:only-child,
+:is(nav, ul, ol) li > a:only-of-type {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
+}
+
+/* Windows High Contrast and similar modes replace author colors. Keep the
+ * things that carry meaning: borders stay visible, and the focus ring follows
+ * the system highlight color. */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
+
+  /* Elements that relied on a background to show an edge need a real border. */
+  [class*="card"],
+  [class*="callout"],
+  button,
+  input,
+  select,
+  textarea {
+    border: var(--border-thin) solid;
+  }
+}
+
+/* People asking for more contrast get the strongest text and border steps. */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-muted: var(--color-text);
+    --color-border: var(--color-border-strong);
+  }
+}

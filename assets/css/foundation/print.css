@@ -1,0 +1,51 @@
+/* Printing. Ink is expensive and navigation is useless on paper.
+ *
+ * Foundation file. A site must not override it. */
+
+@media print {
+  :root {
+    --color-surface: white;
+    --color-text: black;
+    --color-text-muted: black;
+    --shadow-sm: none;
+    --shadow-md: none;
+  }
+
+  body {
+    background: none;
+  }
+
+  /* Chrome that only makes sense on screen. */
+  header nav,
+  footer nav,
+  .skip-link,
+  [data-print="hide"] {
+    display: none;
+  }
+
+  /* Show where a link actually goes, but not for fragments or mailto. */
+  main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: var(--text-xs);
+    word-break: break-all;
+  }
+
+  /* Do not split these across pages if the browser can avoid it. */
+  h1,
+  h2,
+  h3,
+  h4,
+  figure,
+  blockquote,
+  pre,
+  table {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+}

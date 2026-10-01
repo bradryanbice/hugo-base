@@ -1,0 +1,100 @@
+/* Semantic tokens: the only color names layouts and components may use.
+ *
+ * Each one points at a ramp step, never at a raw oklch() value, and dark mode
+ * is the same names pointing at different steps. Interaction states are
+ * derived with relative color syntax, so a site never writes a hover color.
+ *
+ * Foundation file. A site must not override it. */
+
+:root {
+  color-scheme: light dark;
+
+  /* Surfaces */
+  --color-surface: var(--neutral-0);
+  --color-surface-raised: var(--neutral-50);
+  --color-surface-sunken: var(--neutral-100);
+  --color-surface-accent: var(--accent-50);
+
+  /* Text. Muted must still reach 4.5:1 on --color-surface. */
+  --color-text: var(--neutral-950);
+  --color-text-muted: var(--neutral-700);
+  --color-text-inverse: var(--neutral-0);
+
+  /* Lines */
+  --color-border: var(--neutral-300);
+  --color-border-strong: var(--neutral-600);
+
+  /* Accent, and what goes on top of it */
+  --color-accent: var(--accent-700);
+  --color-accent-hover: oklch(from var(--color-accent) calc(l - 0.06) c h);
+  --color-accent-active: oklch(from var(--color-accent) calc(l - 0.12) c h);
+  --color-accent-subtle: var(--accent-100);
+  --color-on-accent: var(--neutral-0);
+
+  /* Links. Visited shifts hue and drops chroma, so it reads as visited
+   * without becoming a second brand color. */
+  --color-link: var(--color-accent);
+  --color-link-hover: var(--color-accent-hover);
+  --color-link-visited: oklch(from var(--color-link) l calc(c * 0.7) calc(h - 45));
+
+  /* Focus. Must hold 3:1 against both the control and the surface behind it. */
+  --color-focus-ring: var(--neutral-950);
+
+  /* Selection */
+  --color-selection: var(--accent-200);
+  --color-selection-text: var(--neutral-950);
+
+  /* Status */
+  --color-info-surface: var(--info-surface);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
+  --color-success-surface: var(--success-surface);
+  --color-success-border: var(--success-border);
+  --color-success-text: var(--success-text);
+  --color-warning-surface: var(--warning-surface);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+  --color-danger-surface: var(--danger-surface);
+  --color-danger-border: var(--danger-border);
+  --color-danger-text: var(--danger-text);
+
+  /* Elevation, scaled by the theme's --shadow-strength. */
+  --shadow-sm: 0 1px 2px oklch(from var(--neutral-1000) l c h / calc(0.06 * var(--shadow-strength, 1)));
+  --shadow-md:
+    0 2px 4px oklch(from var(--neutral-1000) l c h / calc(0.06 * var(--shadow-strength, 1))),
+    0 4px 12px oklch(from var(--neutral-1000) l c h / calc(0.08 * var(--shadow-strength, 1)));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: var(--neutral-1000);
+    --color-surface-raised: var(--neutral-950);
+    --color-surface-sunken: var(--neutral-900);
+    --color-surface-accent: var(--accent-900);
+
+    --color-text: var(--neutral-100);
+    --color-text-muted: var(--neutral-400);
+    --color-text-inverse: var(--neutral-1000);
+
+    --color-border: var(--neutral-800);
+    --color-border-strong: var(--neutral-500);
+
+    /* Lighter steps carry the accent on a dark surface, and the states move
+     * lighter rather than darker. */
+    --color-accent: var(--accent-300);
+    --color-accent-hover: oklch(from var(--color-accent) calc(l + 0.06) c h);
+    --color-accent-active: oklch(from var(--color-accent) calc(l + 0.12) c h);
+    --color-accent-subtle: var(--accent-900);
+    --color-on-accent: var(--neutral-1000);
+
+    --color-focus-ring: var(--neutral-100);
+
+    --color-selection: var(--accent-800);
+    --color-selection-text: var(--neutral-50);
+
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / calc(0.5 * var(--shadow-strength, 1)));
+    --shadow-md:
+      0 2px 4px oklch(0 0 0 / calc(0.4 * var(--shadow-strength, 1))),
+      0 4px 12px oklch(0 0 0 / calc(0.5 * var(--shadow-strength, 1)));
+  }
+}

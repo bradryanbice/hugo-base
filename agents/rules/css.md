@@ -13,14 +13,27 @@ This file is managed by hugo-base. Do not edit it inside a site.
   CI fails on them.
 - Interaction states are derived, not hand written: `oklch(from var(--token)
   calc(l - 0.08) c h)`.
-- Two token layers. Primitives hold raw scales. Semantic aliases
-  (`--color-text`, `--color-surface`, `--color-accent`, `--color-focus-ring`)
-  reference primitives. Components use semantic tokens only, never primitives.
+- Three token layers. `tokens/scale.css` holds sizes and timings.
+  `tokens/color.css` builds ramps (`--neutral-500`, `--accent-700`) from the
+  theme inputs. `tokens/semantic.css` names them for use (`--color-text`,
+  `--color-surface`, `--color-accent`, `--color-focus-ring`). Layouts and
+  components use semantic names only, never a ramp step and never a raw
+  `oklch()`.
+- Dark mode is the same semantic names pointing at different ramp steps, under
+  `prefers-color-scheme: dark`. Anything you add must work in both schemes,
+  which means taking your colors from semantic tokens rather than picking a
+  light value directly.
 
 ## Spacing is an 8pt scale
 
 - Use the spacing tokens, in `rem` (8px is 0.5rem). Do not hard code lengths.
+- `--space-0h` (4px) is the only half step, for icon gaps and focus offsets.
+  Everything else is a multiple of 8.
 - Use logical properties (`margin-block`, `padding-inline`), not physical ones.
+- Spacing between elements comes from the layout primitives (`stack`,
+  `cluster`, `center`, `sidebar`, `switcher`, `grid-auto`), which take a per
+  instance override such as `--stack-space`, so components rarely need their
+  own layout rules.
 
 ## Foundation versus theme
 
@@ -32,14 +45,33 @@ CI fails if a site has its own copy of any of these:
 - `assets/css/foundation/**`
 - `assets/css/layout/primitives.css`
 
-To change how the site looks, write `assets/css/tokens/theme.css`. It takes
-inputs only: accent and neutral hue and chroma, font stacks, radius and shadow
-choices. Component level custom properties (for example `--card-radius`) cover
-finer adjustments. If the theme slot cannot express what a site needs, that is
-a hugo-base issue, not a reason to copy a foundation file.
+To change how a site looks, write `assets/css/tokens/theme.css`. It is the one
+file a site overrides, and it is loaded last in the tokens layer so it has the
+final word. Declare only the inputs you want to change: every input is read
+with its default as a `var()` fallback, so leaving one out keeps the default
+rather than breaking the token.
+
+The inputs are `--accent-hue`, `--accent-chroma`, `--neutral-hue`,
+`--neutral-chroma`, `--status-chroma`, the four status hues, `--font-body`,
+`--font-heading`, `--font-mono`, `--radius-scale` and `--shadow-strength`. The
+base's own `tokens/theme.css` documents each one with its default.
+
+High chroma cannot hold at the light and dark ends of a ramp. If one step looks
+wrong for your hue, override that single step (for example `--accent-700`) in
+your `theme.css`. Component level custom properties such as `--card-radius`
+cover finer adjustments. If the theme slot cannot express what a site needs,
+that is a hugo-base issue, not a reason to copy a foundation file.
 
 Site specific CSS is unlayered and loads after the base, so it wins without
 specificity fights. Add it through the `head/css-site.html` partial.
+
+## Contrast is checked, in both schemes
+
+The quality gate runs axe over every page and separately checks every semantic
+pair in the token contract, in light and in dark mode. A pair that falls below
+4.5:1 for text or 3:1 for borders and focus rings fails the build, as does a
+token that does not resolve. So a brand color that breaks contrast cannot ship,
+and neither can a theme that leaves a token invalid.
 
 ## Modern CSS, no tooling
 
@@ -49,4 +81,5 @@ specificity fights. Add it through the `head/css-site.html` partial.
   `@layer reset, tokens, foundation, layout, components, utilities;`
 - No CSS framework, no Sass, no PostCSS, no npm step for site assets. The only
   pipeline is Hugo Pipes with `css.Build`, then `fingerprint` in production.
-- No `!important` in shared CSS.
+- No `!important` in shared CSS. The one exception in the base is `[hidden]`,
+  which must always win.

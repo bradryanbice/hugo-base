@@ -55,11 +55,33 @@ bash tools/quality/run.sh exampleSite/public
 ```
 
 This serves the built site, runs axe over every URL in its sitemap (WCAG 2.0,
-2.1 and 2.2 A and AA), runs Lighthouse CI against the assertions in
-`tools/quality/lighthouserc.json`, and then self tests by requiring axe to
-fail on a deliberately broken page. Chrome comes from the machine, so no
+2.1 and 2.2 A and AA) in both light and dark mode, checks every semantic color
+pair in the token contract for contrast, runs Lighthouse CI against the
+assertions in `tools/quality/lighthouserc.json`, and then self tests by
+requiring axe to fail on a deliberately broken page. Chrome comes from the machine, so no
 browser is downloaded. Consuming sites get the same gate through the reusable
 workflow, which is where a site's own brand colors get checked for contrast.
+
+## Theming a site
+
+A site declares only the inputs it wants in `assets/css/tokens/theme.css`:
+
+```css
+:root {
+  --accent-hue: 25;
+  --accent-chroma: 0.15;
+  --neutral-chroma: 0.006;
+  --radius-scale: 0;
+}
+```
+
+Ramps, hover and active states, dark mode and elevation are all derived from
+those. Inputs left out keep their defaults, so a theme file cannot break a
+token by omission. The base's own `tokens/theme.css` documents every input, and
+`exampleSite` ships a theme that overrides it.
+
+Everything else in `assets/css/` is foundation: a site must not copy it, and CI
+fails if it does.
 
 ## Renovate
 

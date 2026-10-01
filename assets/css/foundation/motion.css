@@ -1,0 +1,28 @@
+/* Motion is opt in, never opt out.
+ *
+ * Everything that moves lives inside this query, so a person who asks for
+ * reduced motion gets a still page by default rather than one that has to be
+ * patched back to stillness.
+ *
+ * Foundation file. A site must not override it. */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Shared transition for interactive color changes. Components opt in by
+   * using these custom properties rather than writing their own durations. */
+  a,
+  button,
+  summary,
+  input,
+  select,
+  textarea {
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out),
+      outline-color var(--duration-fast) var(--ease-out);
+  }
+}

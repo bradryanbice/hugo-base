@@ -42,6 +42,11 @@ const PAIRS = [
   ["--color-success-text", "--color-success-surface", 4.5],
   ["--color-warning-text", "--color-warning-surface", 4.5],
   ["--color-danger-text", "--color-danger-surface", 4.5],
+  // Syntax highlighting sits on the sunken surface.
+  ["--color-accent", "--color-surface-sunken", 4.5],
+  ["--color-success-text", "--color-surface-sunken", 4.5],
+  ["--color-info-text", "--color-surface-sunken", 4.5],
+  ["--color-danger-text", "--color-surface-sunken", 4.5],
   ["--color-focus-ring", "--color-surface", 3],
   ["--color-focus-ring", "--color-surface-raised", 3],
   ["--color-focus-ring", "--color-surface-sunken", 3],

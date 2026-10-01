@@ -4,9 +4,10 @@
 
 @media print {
   :root {
-    --color-surface: white;
-    --color-text: black;
-    --color-text-muted: black;
+    /* Pure white and black, in the same color space as every other value. */
+    --color-surface: oklch(1 0 0);
+    --color-text: oklch(0 0 0);
+    --color-text-muted: oklch(0 0 0);
     --shadow-sm: none;
     --shadow-md: none;
   }

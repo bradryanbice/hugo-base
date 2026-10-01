@@ -48,6 +48,18 @@ A site's own guidance goes in `.claude/rules/site/*.md`, which the sync tool
 never touches. `CLAUDE.md`, `.claude/settings.json`, config, `mise.toml` and
 `netlify.toml` stay site owned.
 
+## CSS policy lint
+
+```sh
+bash tools/lint/run.sh --self-test . exampleSite
+```
+
+Enforces the CSS rules rather than trusting them: OKLCH only, spacing and color
+from tokens, no `!important`, no removed focus rings, logical properties, and no
+site copy of a foundation file. The config lives in the module, so a rule added
+here reaches a site in the same pull request that bumps hugo-base. `--self-test`
+lints a deliberately broken fixture and requires every rule to fire.
+
 ## Quality gate
 
 ```sh

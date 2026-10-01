@@ -1,0 +1,29 @@
+/* Deliberately broken CSS. The lint self test runs stylelint against this file
+ * and requires every policy rule to fire, which proves the lint still works
+ * rather than silently passing everything.
+ *
+ * Do not fix anything here. Each declaration breaks exactly one rule, named in
+ * the comment above it. */
+
+.fixture {
+  /* color-no-hex */
+  border-block-end-color: #333;
+
+  /* color-named */
+  outline-color: red;
+
+  /* function-disallowed-list */
+  background-color: rgb(0 0 0);
+
+  /* scale-unlimited/declaration-strict-value: a raw length, not a token */
+  margin-block-start: 12px;
+
+  /* declaration-no-important */
+  padding-block: var(--space-2) !important;
+
+  /* declaration-property-value-disallowed-list: never remove a focus ring */
+  outline: none;
+
+  /* plugin/use-logical: physical property instead of the logical one */
+  margin-left: var(--space-2);
+}

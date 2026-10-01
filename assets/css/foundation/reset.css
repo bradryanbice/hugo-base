@@ -78,6 +78,10 @@ table {
   scroll-margin-block-start: var(--space-4);
 }
 
+/* The one !important in the base: an element marked hidden must stay hidden
+ * whatever a component or a site does, or assistive technology and keyboard
+ * users get content that sighted users cannot see. */
 [hidden] {
-  display: none !important; /* The one exception: hidden must always win. */
+  /* stylelint-disable-next-line declaration-no-important */
+  display: none !important;
 }

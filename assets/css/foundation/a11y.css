@@ -13,8 +13,11 @@
   border-radius: var(--radius-sm);
 }
 
-/* Browsers that support :focus-visible should not also draw the old ring. */
+/* Browsers that support :focus-visible should not also draw the old ring on a
+ * mouse click. This is the one place allowed to remove an outline, because the
+ * rule above has already provided the replacement. */
 :focus:not(:focus-visible) {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list */
   outline: none;
 }
 
@@ -24,6 +27,7 @@
   inline-size: 1px;
   block-size: 1px;
   padding: 0;
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
   margin: -1px;
   overflow: hidden;
   clip-path: inset(50%);
@@ -37,6 +41,7 @@
   inline-size: 1px;
   block-size: 1px;
   padding: 0;
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value */
   margin: -1px;
   overflow: hidden;
   clip-path: inset(50%);

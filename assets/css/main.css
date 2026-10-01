@@ -5,6 +5,10 @@
  *
  * Foundation file. A site must not override it. */
 
+/* This file owns the layer order and the import graph. Nothing else in the
+ * base or in a site may use @import: css.Build inlines these at build time. */
+/* stylelint-disable at-rule-disallowed-list */
+
 @layer reset, tokens, foundation, layout, components, utilities;
 
 /* Scales, then the ramps, then the semantic names everything else uses, and

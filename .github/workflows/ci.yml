@@ -21,6 +21,9 @@ jobs:
     with:
       source: exampleSite
       lint-dashes: true
+      # The base's own CSS plus the harness, and prove the lint rules fire.
+      lint-dirs: ". exampleSite"
+      lint-self-test: true
 
   renovate-config:
     name: Renovate config

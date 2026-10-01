@@ -25,6 +25,18 @@ on:
         description: Fail on en or em dashes in any tracked text file.
         type: boolean
         default: false
+      lint-dirs:
+        description: >
+          Directories to run the CSS policy lint over, space separated.
+          Defaults to the site itself. hugo-base passes its own root too.
+        type: string
+        default: ""
+      lint-self-test:
+        description: >
+          Also require every policy rule to fire on the lint's broken fixture.
+          hugo-base turns this on; a site does not need to re-prove it.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -97,6 +109,17 @@ jobs:
           path: ${{ inputs.source }}/public
           if-no-files-found: error
           retention-days: 7
+
+      - name: CSS policy lint
+        env:
+          LINT_DIRS: ${{ inputs.lint-dirs }}
+          SELF_TEST: ${{ inputs.lint-self-test }}
+        run: |
+          dirs="${LINT_DIRS:-$SOURCE}"
+          args=""
+          [ "$SELF_TEST" = "true" ] && args="--self-test"
+          # shellcheck disable=SC2086
+          bash "${{ steps.base.outputs.dir }}/tools/lint/run.sh" $args $dirs
 
       - name: Cache npm downloads for the quality tooling
         uses: actions/cache@v6

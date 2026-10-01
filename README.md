@@ -24,6 +24,30 @@ hugo build --source exampleSite --gc --minify --panicOnWarning
 `exampleSite/` is the test harness. It imports this module from the local
 checkout, so changes show up immediately.
 
+## Shared rules and managed files
+
+hugo-base is the single source of truth for how its sites are built, not just
+for their code. `agents/rules/` holds the conventions (accessibility, CSS and
+tokens, templates, content, maintenance). `tools/managed-files.toml` lists what
+hugo-base owns inside a site:
+
+| In the site | Comes from |
+|---|---|
+| `.claude/rules/hugo-base/*.md` | `agents/rules/` |
+| `.claude/skills/*` | `agents/skills/` |
+| `.github/workflows/ci.yml` | `tools/templates/site-ci.yml`, with the version this site pins |
+| `.github/pull_request_template.md`, `.editorconfig`, `hugo-base.sh` | `tools/templates/` |
+
+A site refreshes them with `./hugo-base.sh sync`, and CI fails when they are
+stale. So a Renovate bump of hugo-base carries that version's updated rules
+into the same pull request, where the diff shows exactly what changed. The
+copies are pinned to the version in the site's `go.mod`, so the instructions a
+site follows always describe the code it actually has.
+
+A site's own guidance goes in `.claude/rules/site/*.md`, which the sync tool
+never touches. `CLAUDE.md`, `.claude/settings.json`, config, `mise.toml` and
+`netlify.toml` stay site owned.
+
 ## Quality gate
 
 ```sh

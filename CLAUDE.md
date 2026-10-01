@@ -1,140 +1,147 @@
 # CLAUDE.md
 
-Guidance for working in `hugo-base`. Read this before changing anything.
+Guidance for maintaining `hugo-base` itself. Read this before changing anything.
+
+The rules that apply to the code (accessibility, CSS and tokens, templates,
+content, maintenance) live in `agents/rules/` and are loaded through
+`.claude/rules/shared`, a symlink to that directory. This repo follows the same
+rules it ships. If this file and a rule ever disagree, the rule wins and this
+file must be corrected.
+
+In short, the non-negotiables are: WCAG 2.2 AA, OKLCH color with layered
+tokens, an 8pt spacing scale, no CSS framework and no build step beyond Hugo
+Pipes, progressive enhancement, and no em or en dashes in prose. Each is
+spelled out in `agents/rules/`.
 
 ## What this repo is
 
-`hugo-base` is a Hugo Module (`github.com/bradryanbice/hugo-base`). It is theme-shaped, not a site. Consuming sites import it through `module.imports` and override any file by placing their own copy at the same path in their project. It is versioned with git tags and semver (`vMAJOR.MINOR.PATCH`). While the version is `0.x`, a MINOR bump may break consumers and must say so in `CHANGELOG.md`.
+`hugo-base` is a Hugo Module (`github.com/bradryanbice/hugo-base`). It is
+theme-shaped, not a site. Consuming sites import it through `module.imports`
+and override individual files by placing their own copy at the same path. It is
+versioned with git tags and semver (`vMAJOR.MINOR.PATCH`). While the version is
+`0.x`, a MINOR bump may break consumers and must say so in `CHANGELOG.md`.
 
-Consumers today: bradbice.com, royalrumblestats.com, playoffsbracket.com, headedapp.com, calaround.app, plus an upcoming political statistics site. The companion repo `hugo-starter` is a thin GitHub template for new sites. It is not this repo.
+Consumers today: bradbice.com, royalrumblestats.com, playoffsbracket.com,
+headedapp.com, calaround.app, plus an upcoming political statistics site. The
+companion repo `hugo-starter` is a thin GitHub template for new sites. It is
+not this repo.
 
 ## The scope test
 
-Before adding anything, ask: would this be true for every consuming site? If it would only be true for one site, it does not belong here.
+Before adding anything, ask: would this be true for every consuming site? If it
+would only be true for one site, it does not belong here.
 
-In scope: design tokens (slots and neutral defaults), reset, typography, base layouts (`baseof`, `single`, `list`, `404`), head, SEO and schema partials, header, footer, nav shell, skip link, sitemap and feed output, image processing pipeline, the shared shortcodes (`figure`, `callout`, `table`), archetypes, the reusable CI workflow, the Renovate preset, and `exampleSite/`.
+In scope: design tokens (slots and neutral defaults), reset, typography, base
+layouts (`baseof`, `single`, `list`, `404`), head, SEO and schema partials,
+header, footer, nav shell, skip link, sitemap and feed output, image processing
+pipeline, the shared shortcodes (`figure`, `callout`, `table`), archetypes, the
+reusable CI workflow, the Renovate preset, the shared rules, and `exampleSite/`.
 
-Out of scope, always: domain names, brand color values, navigation content, analytics IDs, any data schema, any content-type-specific layout, chart components (explicitly deferred).
+Out of scope, always: domain names, brand color values, navigation content,
+analytics IDs, any data schema, any content-type-specific layout, chart
+components (explicitly deferred).
 
-## Non-negotiables
+## Repository layout
 
-### Accessibility (WCAG 2.2 AA minimum)
+| Path | What it holds |
+|---|---|
+| `layouts/`, `assets/`, `i18n/`, `archetypes/` | the module itself, what consumers get |
+| `agents/rules/` | the shared rules, synced into every site |
+| `agents/skills/` | skills synced into every site |
+| `tools/managed-files.toml` | what hugo-base owns inside a site, and the marker that identifies the module on disk |
+| `tools/sync.py` | copies managed files into a site, `--check` fails when stale |
+| `tools/templates/` | the files a site receives (CI caller, PR template, editorconfig, the `hugo-base.sh` stub) |
+| `tools/ci/`, `tools/quality/` | the gate, run from the version a site pins |
+| `renovate/hugo.json` | shared Renovate preset |
+| `exampleSite/` | the test harness, and the first consumer of the sync |
 
-- Every page has exactly one `<header>` banner, one `<nav>` per navigation region with an accessible name, one `<main id="main">`, and one `<footer>` contentinfo. Do not nest landmarks incorrectly.
-- A skip link is the first focusable element and moves focus to `<main>`.
-- Focus is always visible. Use `:focus-visible` with a focus ring that meets WCAG 2.2 focus appearance guidance (at least 2px, 3:1 contrast against adjacent colors). Never write `outline: none` without a replacement.
-- No keyboard traps. Everything interactive is reachable and operable by keyboard in a logical order.
-- Target size is at least 24 by 24 CSS pixels (WCAG 2.2 SC 2.5.8).
-- Honor `prefers-reduced-motion: reduce`. Motion is opt-in inside `@media (prefers-reduced-motion: no-preference)`, not opt-out.
-- Text contrast is at least 4.5:1 (3:1 for large text and UI components). Semantic token pairs are the unit of contrast checking.
-- Images require an explicit `alt`. Decorative images use `alt=""` on purpose, never by omission. The image partial fails the build when `alt` is missing.
-- Use `aria-current="page"` on the active nav link. Prefer native HTML semantics over ARIA.
-- Headings are hierarchical with one `<h1>` per page.
-- The CI gate (axe plus Lighthouse accessibility) must pass. Never lower a threshold to get a PR green.
+## How a change reaches the sites
 
-### Color: OKLCH, layered tokens
+Three things travel, all pinned to the version a site has in `go.mod`:
 
-- All color values are `oklch()`. No hex, rgb, or hsl literals in CSS except inside a comment explaining a conversion.
-- Two token layers:
-  1. Primitives: raw scales, for example `--neutral-0` through `--neutral-1000`, built from the theme's hue and chroma inputs.
-  2. Semantic aliases that reference primitives only, for example `--color-text`, `--color-surface`, `--color-accent`, `--color-focus-ring`.
-- Interaction states (hover, active, subtle) are derived with relative color syntax, `oklch(from var(--token) ...)`, never hand-written per theme.
-- Components and layouts use semantic tokens only. They never reference primitives directly.
-- The base ships theme inputs with neutral defaults. No brand color values live here. A consuming site themes itself by overriding `assets/css/tokens/theme.css` and nothing else.
+1. **Code**, through the module.
+2. **Instructions**, through `agents/` and the sync tool, as committed copies in
+   each site.
+3. **Enforcement**, through `tools/` run by the reusable workflow.
 
-### Foundation versus theme
+So a convention change is one pull request containing the rule edit, the CI
+enforcement for it where a machine can check it, and a `migrations/vX.Y.Z.md`
+note telling sites how to comply. A rule with no enforcement and no migration
+is incomplete. Rules are context, not enforcement: anything checkable must also
+be checked.
 
-- Foundation CSS (`main.css`, `tokens/scale.css`, `tokens/color.css`, `tokens/semantic.css`, `foundation/**`, `layout/primitives.css`) is owned by the base. Sites must not override these paths, and CI blocks it. Foundation files control how things are expressed (color format, scales, focus, motion, layout mechanics), never what brand they express.
-- The theme slot (`tokens/theme.css`) and component-level custom properties are the supported ways for a site to change appearance. If a site needs something the slot cannot express, fix the base.
+## Hugo conventions
 
-### Spacing: 8pt scale
+`agents/rules/templates.md` holds the template system rules, which apply here
+too. Two more that matter only in this repo:
 
-- Spacing comes from tokens on an 8pt scale expressed in `rem` (1rem = 16px at default browser settings, so 8px = 0.5rem). Do not hard-code spacing lengths in component CSS.
-- Use logical properties (`margin-block`, `padding-inline`) rather than physical ones.
-
-### Writing style
-
-- No em dashes and no en dashes in any prose: docs, comments, README, commit messages, issue text, i18n strings. Use commas, periods, or parentheses. CI lints for U+2013 and U+2014 and fails the build.
-
-### CSS
-
-- Modern CSS is encouraged: cascade layers, nesting, custom properties, container queries, `:has()`, logical properties.
-- No CSS framework. No Sass. No PostCSS. No npm build step for site assets. The only pipeline is Hugo Pipes, using `css.Build` (Hugo v0.158.0 and later) to bundle `@import`, then `fingerprint` in production.
-- Layer order is declared once in `assets/css/main.css`: `@layer reset, tokens, foundation, layout, components, utilities;`. Consuming site CSS is unlayered, so it wins over the base without specificity fights. Do not use `!important` in the base.
-
-### Progressive enhancement
-
-- Every page works with JavaScript disabled. Navigation, content, images, and forms all function without JS.
-- The base ships no JavaScript in v0.1.0. If JS is added later, it enhances an already working HTML baseline and is loaded with `defer` or `type="module"`.
-
-## Hugo conventions (target: Hugo v0.166.0)
-
-Common examples online are often out of date. Follow these rules, not memory.
-
-- Template layout uses the system introduced in v0.146.0:
-  - No `layouts/_default/`. Templates live at the `layouts/` root: `baseof.html`, `home.html`, `single.html`, `list.html`, `404.html`.
-  - Partials live in `layouts/_partials/`, shortcodes in `layouts/_shortcodes/`, render hooks in `layouts/_markup/`.
-  - Embedded templates are called as partials, for example `{{ partial "opengraph.html" . }}`. The `_internal/` form is gone.
-- `{{ return }}` is only valid inside a partial (hard error since v0.166.0).
-- Do not define `module.mounts` in this repo. Defining any mount removes all default mounts for the module. If a mount becomes necessary, re-declare every default mount explicitly and use `files` (not the deprecated `includeFiles`, `excludeFiles`, or `lang`). Glob semantics changed in v0.166.0 (`**/x` no longer matches a bare `x`).
-- Config from a module only merges into the site for `params` (deep), `menus`, `mediaTypes`, and `outputFormats` (shallow). `outputs`, `imaging`, `markup`, `sitemap`, `taxonomies`, and root keys do NOT merge by default. Do not assume a setting in this repo's `hugo.toml` reaches a consuming site. Document any config a consumer must copy or opt into with `_merge`.
-- Site params contributed by the base are namespaced under `params.base` to avoid collisions.
-- Imaging config uses per-format keys (`imaging.webp.quality`, `imaging.jpeg.quality`, `imaging.avif.*`). Top-level `imaging.quality`, `hint`, and `compression` are deprecated since v0.163.0.
-- Use the `hugo build` command in scripts and docs.
-- Language config keys were renamed in v0.158.0: `languageCode` is now `locale`, `languageDirection` is `direction`, `languageName` is `label`. In templates use `.Language.Locale`, `.Language.Direction`, `.Language.Label`.
-- Keep `module.hugoVersion.min` equal to the lowest version CI has actually tested. Never set `hugoVersion.extended` (deprecated).
-- Overridable seams are partials with stable names. Renaming or removing a partial, shortcode, token, or i18n key is a breaking change and must be listed in `CHANGELOG.md`.
-
-## Shared rules for consuming sites
-
-This repo is also the source of truth for how every site is built and maintained.
-
-- Rules for sites live in `agents/rules/`. Skills live in `agents/skills/`. Files the base owns inside a site are listed in `tools/managed-files.toml`. `tools/sync.sh` copies them into a site at the site's pinned version, and CI fails when a site's copies are stale.
-- This repo loads the same rules through the `.claude/rules/shared` symlink. When a rule there conflicts with this file, the rule wins, and this file must be corrected.
-- A change to a convention ships as one PR containing: the rule edit, the CI enforcement for it (lint, check, or gate) where it can be automated, and a `migrations/vX.Y.Z.md` note telling sites how to comply. A rule with no enforcement and no migration is incomplete.
-- Keep rules short and specific. They are context, not enforcement.
+- Do not define `module.mounts`. Declaring any mount removes every default
+  mount for the module. If one becomes necessary, re-declare all seven defaults
+  and use `files` (not the deprecated `includeFiles`, `excludeFiles` or `lang`).
+  Glob semantics changed in v0.166.0: `**/x` no longer matches a bare `x`.
+- Config from a module merges into a site only for `params` (deep), `menus`,
+  `mediaTypes` and `outputFormats` (shallow). `outputs`, `imaging`, `markup`,
+  `sitemap`, `taxonomies` and root keys do NOT merge. Never assume a setting in
+  this repo's `hugo.toml` reaches a site. Document what a consumer must carry.
+- Params the base contributes are namespaced under `params.base`.
+- Keep `module.hugoVersion.min` equal to the lowest version CI has tested.
+  Never set `hugoVersion.extended` (deprecated).
+- Renaming or removing a partial, shortcode, token or i18n key is a breaking
+  change. List it in `CHANGELOG.md`.
 
 ## Version management
 
-The Hugo version lives in three places and they must always agree:
+The Hugo version lives in `netlify.toml`, `mise.toml` and any workflow that
+pins one. They must always agree, Renovate bumps them together, and
+`tools/ci/check-versions.sh` fails on drift. The same applies to Go.
 
-- `netlify.toml`: `[build.environment] HUGO_VERSION`
-- `.github/workflows/*.yml`: the Hugo version used by CI
-- `mise.toml`: the local toolchain
+Never run `go mod tidy` here or in a consumer: there is no Go code, so it would
+drop module requirements. Use `hugo mod tidy`.
 
-Rules:
-
-- Never bump one without the others. Renovate opens a single grouped PR per Hugo release. Merge it only when CI is green.
-- CI runs a drift check that fails if the three values differ.
-- The Renovate preset in `renovate/` must stay copyable into consuming sites unchanged. Do not add paths or names specific to this repo.
-- Do not run `go mod tidy` on this repo or on consumers. There is no Go code, so it would drop module requirements. Use `hugo mod tidy`.
+Keep `renovate/hugo.json` copyable into any site unchanged. Nothing in it may
+be specific to this repo.
 
 ## CI gate
 
-CI builds `exampleSite` with `hugo build --gc --minify --panicOnWarning`, fails on deprecation notices, lints prose for dashes, checks version drift, then runs axe and Lighthouse CI against the built output. This gate is what makes automated Hugo bumps safe.
+CI builds `exampleSite` with `--gc --minify --panicOnWarning`, fails on
+deprecation notices, lints prose for dashes, checks version drift, verifies the
+managed files in `exampleSite` are current, then runs axe and Lighthouse
+against the built output. This is what makes automated Hugo bumps safe.
 
-- A change that is not exercised by `exampleSite` is not tested. Every layout, partial, shortcode, and render hook must be rendered by at least one exampleSite page.
-- The gate is `.github/workflows/site-ci.yml`, a reusable workflow. It installs the toolchain from the caller's `mise.toml` and runs the scripts in `tools/ci/` from the hugo-base version the caller pins, located with `hugo config mounts`. Scripts there must stay bash 3.2 compatible (macOS) and must not assume they run inside the hugo-base repo.
-- The gate must be proven to fail. `tools/quality/fixtures/violation.html` is deliberately broken and the gate asserts that axe fails on it. Never fix that file.
-- Lighthouse thresholds live in `tools/quality/lighthouserc.json`. Accessibility must stay at 1. Raise a threshold when the code improves, never lower one to get a PR green.
+- A change not exercised by `exampleSite` is not tested. Every layout, partial,
+  shortcode and render hook must be rendered by at least one page there.
+- The gate must be proven to fail. `tools/quality/fixtures/violation.html` is
+  deliberately broken and the gate asserts axe fails on it. Never fix it.
+- Lighthouse thresholds are in `tools/quality/lighthouserc.json`. Accessibility
+  stays at 1. Raise a threshold when the code improves, never lower one to get
+  a pull request green.
+- Scripts in `tools/` must stay bash 3.2 compatible (macOS) or use python3 from
+  the standard library, and must not assume they run inside this repo: in a
+  consumer they run from the read-only Go module cache.
 
 ## Common commands
 
 ```sh
-mise install                                   # install pinned Hugo and Go
+mise install                                   # install the pinned toolchain
 hugo server --source exampleSite               # local dev against the base
 hugo mod graph --source exampleSite            # confirm the module resolves
 
-# The same checks CI runs (tools/ci/ is shared with consuming sites):
+# The checks CI runs:
 bash tools/ci/check-versions.sh                # Hugo and Go pins agree
 bash tools/ci/lint-dashes.sh                   # no en or em dashes
 bash tools/ci/build.sh exampleSite             # strict build, fails on deprecations
-bash tools/quality/run.sh exampleSite/public   # axe, Lighthouse, and the gate self test
+python3 tools/sync.py --base . --site exampleSite --check
+bash tools/quality/run.sh exampleSite/public   # axe, Lighthouse, gate self test
+
+python3 tools/sync.py --base . --site exampleSite   # refresh managed files
 ```
 
-## Working agreements for Claude
+## Working agreements
 
-- Read the current Hugo docs at gohugo.io before implementing anything Hugo-specific. Do not rely on training data for template names, config keys, or function signatures.
-- Keep changes scoped to one issue. Update `exampleSite`, `CHANGELOG.md`, and the README override guide in the same change when behavior changes.
-- When something is ambiguous in the Hugo docs, stop and raise it as a question rather than guessing.
-- Run the build locally with `--panicOnWarning` before declaring work done.
+- Read the current Hugo docs at gohugo.io before implementing anything Hugo
+  specific. Do not rely on training data for template names, config keys or
+  function signatures.
+- Keep changes scoped to one issue. Update `exampleSite`, `CHANGELOG.md` and
+  the affected rule file in the same change.
+- When the Hugo docs are ambiguous, stop and ask rather than guessing.
+- Run the gate locally before declaring work done.

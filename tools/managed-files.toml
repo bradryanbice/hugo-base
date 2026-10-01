@@ -1,0 +1,37 @@
+# Files hugo-base owns inside a consuming site.
+#
+# source is relative to the hugo-base module, target is relative to the site.
+# A directory entry copies everything matching glob. An entry with
+# substitute = true gets __HUGO_BASE_VERSION__ replaced with the hugo-base
+# version the site pins.
+#
+# This file is also the marker that identifies the hugo-base module on disk,
+# so the sync stub can find it whatever path it was fetched to.
+
+[[files]]
+source = "agents/rules"
+target = ".claude/rules/hugo-base"
+glob = "*.md"
+
+[[files]]
+source = "agents/skills"
+target = ".claude/skills"
+glob = "*/SKILL.md"
+
+[[files]]
+source = "tools/templates/site-ci.yml"
+target = ".github/workflows/ci.yml"
+substitute = true
+
+[[files]]
+source = "tools/templates/pull_request_template.md"
+target = ".github/pull_request_template.md"
+
+[[files]]
+source = "tools/templates/editorconfig"
+target = ".editorconfig"
+
+[[files]]
+source = "tools/templates/hugo-base.sh"
+target = "hugo-base.sh"
+mode = "755"

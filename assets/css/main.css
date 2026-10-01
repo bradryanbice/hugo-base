@@ -1,0 +1,28 @@
+/* hugo-base CSS entry point.
+ *
+ * Layer order is declared once, here. Site CSS is unlayered and loads after
+ * this file, so it wins over everything below without specificity fights.
+ *
+ * Foundation file. A site must not override it. */
+
+@layer reset, tokens, foundation, layout, components, utilities;
+
+/* Scales, then the ramps, then the semantic names everything else uses, and
+ * the site's theme last.
+ *
+ * theme.css comes last on purpose. Custom properties resolve lazily, so the
+ * ramps still pick up a site's inputs wherever they are declared, but a site
+ * that wants to override one computed step (say --accent-700, when a hue clips
+ * at that lightness) needs the last word on it. */
+@import "tokens/scale.css" layer(tokens);
+@import "tokens/color.css" layer(tokens);
+@import "tokens/semantic.css" layer(tokens);
+@import "tokens/theme.css" layer(tokens);
+
+@import "foundation/reset.css" layer(reset);
+@import "foundation/global.css" layer(foundation);
+@import "foundation/a11y.css" layer(foundation);
+@import "foundation/motion.css" layer(foundation);
+@import "foundation/print.css" layer(foundation);
+
+@import "layout/primitives.css" layer(layout);

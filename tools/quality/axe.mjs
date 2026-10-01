@@ -17,7 +17,7 @@ import { chromium } from "playwright-core";
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 function parseArgs(argv) {
-  const args = { urls: [], expectViolations: false };
+  const args = { urls: [], expectViolations: false, colorScheme: "light" };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     const next = () => argv[(i += 1)];
@@ -26,6 +26,7 @@ function parseArgs(argv) {
     else if (arg === "--url") args.urls.push(next());
     else if (arg === "--report") args.report = next();
     else if (arg === "--expect-violations") args.expectViolations = true;
+    else if (arg === "--color-scheme") args.colorScheme = next();
     else throw new Error(`unknown argument: ${arg}`);
   }
   if (!args.base) throw new Error("--base is required");
@@ -85,7 +86,9 @@ const results = [];
 let violationCount = 0;
 
 try {
-  const context = await browser.newContext();
+  // Emulate the OS light or dark preference, so both sets of semantic tokens
+  // get their contrast checked rather than only the default scheme.
+  const context = await browser.newContext({ colorScheme: args.colorScheme });
   for (const url of urls) {
     const page = await context.newPage();
     const response = await page.goto(url, { waitUntil: "load" });
@@ -111,10 +114,15 @@ try {
 }
 
 if (args.report) {
-  writeFileSync(args.report, JSON.stringify({ tags: TAGS, results }, null, 2));
+  writeFileSync(
+    args.report,
+    JSON.stringify({ tags: TAGS, colorScheme: args.colorScheme, results }, null, 2),
+  );
 }
 
-console.log(`\naxe checked ${urls.length} page(s) against ${TAGS.join(", ")}`);
+console.log(
+  `\naxe checked ${urls.length} page(s) in ${args.colorScheme} mode against ${TAGS.join(", ")}`,
+);
 
 if (args.expectViolations) {
   if (violationCount === 0) {

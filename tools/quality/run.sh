@@ -7,7 +7,8 @@
 # Steps:
 #   1. install the pinned tooling (copied out of the module, which is read only)
 #   2. serve the built site locally
-#   3. run axe over every URL in the site's sitemap
+#   3. run axe over every URL in the site's sitemap, and check the semantic
+#      color token contract, in both light and dark mode
 #   4. run Lighthouse CI with the assertions in lighthouserc.json
 #   5. self test: serve a deliberately broken page and require axe to fail on it
 #
@@ -70,12 +71,24 @@ echo "Installing quality tooling"
 site_port=$(free_port)
 serve "$public" "$site_port"
 
-echo
-echo "Running axe over the sitemap"
-node "$workdir/axe.mjs" \
-  --base "http://127.0.0.1:$site_port" \
-  --sitemap "$public/sitemap.xml" \
-  --report "$report_dir/axe.json"
+# Both color schemes, because the semantic tokens differ between them and a
+# dark mode contrast regression would otherwise ship unnoticed.
+for scheme in light dark; do
+  echo
+  echo "Running axe over the sitemap ($scheme mode)"
+  node "$workdir/axe.mjs" \
+    --base "http://127.0.0.1:$site_port" \
+    --sitemap "$public/sitemap.xml" \
+    --color-scheme "$scheme" \
+    --report "$report_dir/axe-$scheme.json"
+
+  echo
+  echo "Checking the semantic color contract ($scheme mode)"
+  node "$workdir/contrast.mjs" \
+    --url "http://127.0.0.1:$site_port/" \
+    --color-scheme "$scheme" \
+    --report "$report_dir/contrast-$scheme.json"
+done
 
 echo
 echo "Running Lighthouse CI"

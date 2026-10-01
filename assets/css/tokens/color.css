@@ -1,0 +1,86 @@
+/* Color ramps, built from the theme inputs.
+ *
+ * Every input is read with its default as a var() fallback, so a site's
+ * theme.css only has to set what it wants to change. An input it leaves out
+ * keeps the default here rather than making the token invalid.
+ *
+ * Every value is oklch(). The lightness steps are fixed so contrast behaves
+ * the same whatever hue a site picks, and chroma tapers at both ends because
+ * high chroma cannot stay in gamut there.
+ *
+ * Step numbers run light to dark in both schemes: 0 is the lightest. Semantic
+ * aliases pick steps, so dark mode is a different set of picks, not a
+ * different ramp.
+ *
+ * Foundation file. A site must not override it. Change the inputs in
+ * tokens/theme.css instead. */
+
+:root {
+  /* Neutral ramp. Chroma is already small, so it only tapers at the ends. */
+  --neutral-0: oklch(1 0 var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-50: oklch(0.985 calc(var(--neutral-chroma, 0) * 0.4) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-100: oklch(0.967 calc(var(--neutral-chroma, 0) * 0.6) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-200: oklch(0.925 calc(var(--neutral-chroma, 0) * 0.8) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-300: oklch(0.87 var(--neutral-chroma, 0) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-400: oklch(0.715 var(--neutral-chroma, 0) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-500: oklch(0.6 var(--neutral-chroma, 0) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-600: oklch(0.51 var(--neutral-chroma, 0) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-700: oklch(0.43 var(--neutral-chroma, 0) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-800: oklch(0.35 calc(var(--neutral-chroma, 0) * 0.9) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-900: oklch(0.26 calc(var(--neutral-chroma, 0) * 0.8) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-950: oklch(0.19 calc(var(--neutral-chroma, 0) * 0.7) var(--neutral-hue, var(--accent-hue, 250)));
+  --neutral-1000: oklch(0.13 calc(var(--neutral-chroma, 0) * 0.6) var(--neutral-hue, var(--accent-hue, 250)));
+
+  /* Accent ramp. 600 and 700 are the text safe steps on a light surface,
+   * 300 and 400 on a dark one. */
+  --accent-50: oklch(0.97 calc(var(--accent-chroma, 0) * 0.25) var(--accent-hue, 250));
+  --accent-100: oklch(0.94 calc(var(--accent-chroma, 0) * 0.4) var(--accent-hue, 250));
+  --accent-200: oklch(0.89 calc(var(--accent-chroma, 0) * 0.6) var(--accent-hue, 250));
+  --accent-300: oklch(0.82 calc(var(--accent-chroma, 0) * 0.8) var(--accent-hue, 250));
+  --accent-400: oklch(0.72 calc(var(--accent-chroma, 0) * 0.95) var(--accent-hue, 250));
+  --accent-500: oklch(0.62 var(--accent-chroma, 0) var(--accent-hue, 250));
+  --accent-600: oklch(0.53 var(--accent-chroma, 0) var(--accent-hue, 250));
+  --accent-700: oklch(0.45 var(--accent-chroma, 0) var(--accent-hue, 250));
+  --accent-800: oklch(0.37 calc(var(--accent-chroma, 0) * 0.9) var(--accent-hue, 250));
+  --accent-900: oklch(0.28 calc(var(--accent-chroma, 0) * 0.8) var(--accent-hue, 250));
+
+  /* Status colors. Each has a surface, a border and a text step, so a callout
+   * can be built without inventing values. */
+  --info-surface: oklch(0.96 calc(var(--status-chroma, 0.11) * 0.25) var(--info-hue, 245));
+  --info-border: oklch(0.6 calc(var(--status-chroma, 0.11) * 0.9) var(--info-hue, 245));
+  --info-text: oklch(0.44 var(--status-chroma, 0.11) var(--info-hue, 245));
+
+  --success-surface: oklch(0.96 calc(var(--status-chroma, 0.11) * 0.25) var(--success-hue, 150));
+  --success-border: oklch(0.6 calc(var(--status-chroma, 0.11) * 0.9) var(--success-hue, 150));
+  --success-text: oklch(0.42 var(--status-chroma, 0.11) var(--success-hue, 150));
+
+  --warning-surface: oklch(0.96 calc(var(--status-chroma, 0.11) * 0.3) var(--warning-hue, 85));
+  --warning-border: oklch(0.6 calc(var(--status-chroma, 0.11) * 0.9) var(--warning-hue, 85));
+  --warning-text: oklch(0.42 var(--status-chroma, 0.11) var(--warning-hue, 85));
+
+  --danger-surface: oklch(0.96 calc(var(--status-chroma, 0.11) * 0.25) var(--danger-hue, 25));
+  --danger-border: oklch(0.6 calc(var(--status-chroma, 0.11) * 0.9) var(--danger-hue, 25));
+  --danger-text: oklch(0.45 var(--status-chroma, 0.11) var(--danger-hue, 25));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark surfaces need slightly more chroma to avoid looking muddy, and
+     * status text has to lighten to stay readable. */
+    --info-surface: oklch(0.26 calc(var(--status-chroma, 0.11) * 0.35) var(--info-hue, 245));
+    --info-border: oklch(0.62 calc(var(--status-chroma, 0.11) * 0.9) var(--info-hue, 245));
+    --info-text: oklch(0.86 calc(var(--status-chroma, 0.11) * 0.6) var(--info-hue, 245));
+
+    --success-surface: oklch(0.25 calc(var(--status-chroma, 0.11) * 0.35) var(--success-hue, 150));
+    --success-border: oklch(0.62 calc(var(--status-chroma, 0.11) * 0.9) var(--success-hue, 150));
+    --success-text: oklch(0.86 calc(var(--status-chroma, 0.11) * 0.6) var(--success-hue, 150));
+
+    --warning-surface: oklch(0.25 calc(var(--status-chroma, 0.11) * 0.4) var(--warning-hue, 85));
+    --warning-border: oklch(0.62 calc(var(--status-chroma, 0.11) * 0.9) var(--warning-hue, 85));
+    --warning-text: oklch(0.88 calc(var(--status-chroma, 0.11) * 0.6) var(--warning-hue, 85));
+
+    --danger-surface: oklch(0.26 calc(var(--status-chroma, 0.11) * 0.35) var(--danger-hue, 25));
+    --danger-border: oklch(0.62 calc(var(--status-chroma, 0.11) * 0.9) var(--danger-hue, 25));
+    --danger-text: oklch(0.87 calc(var(--status-chroma, 0.11) * 0.6) var(--danger-hue, 25));
+  }
+}

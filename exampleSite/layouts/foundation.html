@@ -1,0 +1,114 @@
+{{/* Reference page for the CSS foundation. It lives in exampleSite, not in the
+base, because it is a test fixture rather than something a real site needs.
+
+Every semantic text and surface pair is rendered as real text on its real
+background, so axe checks the contrast of the tokens this site's theme
+produces. Swatches alone would not be checked. */}}
+
+{{ define "main" }}
+  <div class="center stack" style="--center-width: var(--width-content)">
+    <h1>{{ .Title }}</h1>
+    {{ .Content }}
+
+    <h2>Text on surfaces</h2>
+    <div class="grid-auto">
+      {{ range slice
+        (dict "name" "surface" "bg" "--color-surface")
+        (dict "name" "surface-raised" "bg" "--color-surface-raised")
+        (dict "name" "surface-sunken" "bg" "--color-surface-sunken")
+        (dict "name" "surface-accent" "bg" "--color-surface-accent")
+      }}
+        <div class="stack" style="--stack-space: var(--space-1); background: var({{ .bg }}); padding: var(--space-3); border: var(--border-thin) solid var(--color-border); border-radius: var(--radius-md)">
+          <p style="color: var(--color-text)"><code>{{ .name }}</code> with <code>text</code></p>
+          <p style="color: var(--color-text-muted)">Muted text on {{ .name }}, which must still reach 4.5 to 1.</p>
+          <p><a href="#main" style="color: var(--color-link)">A link</a> and
+            <a href="https://example.org/visited-probe" style="color: var(--color-link-visited)">a visited link</a>.</p>
+        </div>
+      {{ end }}
+    </div>
+
+    <h2>Accent</h2>
+    <div class="cluster">
+      <span style="background: var(--color-accent); color: var(--color-on-accent); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md)">on-accent over accent</span>
+      <span style="background: var(--color-accent-hover); color: var(--color-on-accent); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md)">hover state, derived</span>
+      <span style="background: var(--color-accent-active); color: var(--color-on-accent); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md)">active state, derived</span>
+      <span style="background: var(--color-accent-subtle); color: var(--color-text); padding: var(--space-1) var(--space-3); border-radius: var(--radius-md)">text over accent-subtle</span>
+    </div>
+
+    <h2>Status</h2>
+    <div class="grid-auto" style="--grid-min: 14rem">
+      {{ range slice "info" "success" "warning" "danger" }}
+        <p style="background: var(--color-{{ . }}-surface); color: var(--color-{{ . }}-text); border: var(--border-thin) solid var(--color-{{ . }}-border); padding: var(--space-2); border-radius: var(--radius-md)">{{ . }}: text on its own surface.</p>
+      {{ end }}
+    </div>
+
+    <h2>Focus ring</h2>
+    <p>Tab to these. The ring must stay visible on every surface, in both
+      schemes, and in forced colors mode.</p>
+    <div class="cluster">
+      <a href="#main">A focusable link</a>
+      <button type="button">A button</button>
+      <label>A field <input type="text" name="probe" placeholder="type here"></label>
+    </div>
+
+    <h2>Spacing scale</h2>
+    <p>The 8pt scale, plus the single 4px half step.</p>
+    <ul role="list" class="stack" style="--stack-space: var(--space-0h)">
+      {{ range slice "0h" "1" "2" "3" "4" "5" "6" "8" "10" "12" "16" }}
+        <li class="cluster" style="--cluster-gap: var(--space-2)">
+          <code style="min-inline-size: 7ch">space-{{ . }}</code>
+          <span style="display: inline-block; block-size: var(--space-2); inline-size: var(--space-{{ . }}); background: var(--color-accent)"></span>
+        </li>
+      {{ end }}
+    </ul>
+
+    <h2>Type scale</h2>
+    <div class="stack">
+      {{ range slice "xs" "sm" "base" "md" "lg" "xl" "2xl" "3xl" }}
+        <p style="font-size: var(--text-{{ . }}); margin: 0">text-{{ . }}: the quick brown fox</p>
+      {{ end }}
+    </div>
+
+    <h2>Radius and elevation</h2>
+    <div class="cluster">
+      {{ range slice "sm" "md" "lg" }}
+        <span style="background: var(--color-surface-raised); color: var(--color-text); border: var(--border-thin) solid var(--color-border); border-radius: var(--radius-{{ . }}); padding: var(--space-2)">radius-{{ . }}</span>
+      {{ end }}
+      {{ range slice "sm" "md" }}
+        <span style="background: var(--color-surface-raised); color: var(--color-text); box-shadow: var(--shadow-{{ . }}); border-radius: var(--radius-md); padding: var(--space-2)">shadow-{{ . }}</span>
+      {{ end }}
+    </div>
+
+    <h2>Layout primitives</h2>
+
+    <h3>cluster</h3>
+    <div class="cluster">
+      {{ range seq 6 }}
+        <span style="background: var(--color-surface-sunken); color: var(--color-text); padding: var(--space-1) var(--space-2)">item {{ . }}</span>
+      {{ end }}
+    </div>
+
+    <h3>switcher</h3>
+    <div class="switcher">
+      {{ range seq 3 }}
+        <p style="background: var(--color-surface-sunken); color: var(--color-text); padding: var(--space-2); margin: 0">column {{ . }}, which becomes a row when there is not enough room</p>
+      {{ end }}
+    </div>
+
+    <h3>sidebar</h3>
+    <div class="sidebar">
+      <p style="background: var(--color-surface-sunken); color: var(--color-text); padding: var(--space-2); margin: 0">sidebar, fixed basis</p>
+      <p style="background: var(--color-surface-raised); color: var(--color-text); padding: var(--space-2); margin: 0">main content, which grows and pushes the sidebar onto its own row when space runs out</p>
+    </div>
+
+    <h3>grid-auto</h3>
+    <div class="grid-auto" style="--grid-min: 10rem">
+      {{ range seq 4 }}
+        <p style="background: var(--color-surface-sunken); color: var(--color-text); padding: var(--space-2); margin: 0">cell {{ . }}</p>
+      {{ end }}
+    </div>
+
+    <h3>wrap-anywhere</h3>
+    <p class="wrap-anywhere" style="max-inline-size: 18rem">https://example.org/a/deliberately/unbroken/url/that/would/otherwise/force/horizontal/scrolling/at/400/percent/zoom</p>
+  </div>
+{{ end }}

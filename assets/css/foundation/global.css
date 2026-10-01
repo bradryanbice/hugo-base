@@ -1,0 +1,38 @@
+/* Document level defaults that are not typography and not layout.
+ *
+ * Foundation file. A site must not override it. */
+
+html {
+  /* Stop iOS inflating text in landscape while leaving user zoom alone. */
+  text-size-adjust: 100%;
+
+  /* Room for a sticky header when jumping to an anchor. */
+  scroll-padding-block-start: var(--space-8);
+}
+
+body {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  min-block-size: 100svb;
+}
+
+/* Form controls pick up the brand without per control styling. */
+:root {
+  accent-color: var(--color-accent);
+}
+
+::selection {
+  background-color: var(--color-selection);
+  color: var(--color-selection-text);
+}
+
+/* Give the page a predictable text selection and caret color. */
+:root {
+  caret-color: var(--color-accent);
+}
+
+hr {
+  border: 0;
+  border-block-start: var(--border-thin) solid var(--color-border);
+  margin-block: var(--space-4);
+}

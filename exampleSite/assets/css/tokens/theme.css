@@ -1,0 +1,18 @@
+/* exampleSite's theme. This file overrides the base's tokens/theme.css simply
+ * by sitting at the same path, which is the one supported way a site changes
+ * how it looks.
+ *
+ * It is a deliberately strong teal so the override is obvious, and so the
+ * quality gate checks contrast against a real brand color rather than grey. */
+
+:root {
+  --accent-hue: 195;
+  --accent-chroma: 0.13;
+
+  /* A hint of the brand hue in the greys. */
+  --neutral-hue: 195;
+  --neutral-chroma: 0.008;
+
+  --radius-scale: 1.5;
+  --shadow-strength: 1;
+}

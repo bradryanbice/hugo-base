@@ -1,0 +1,28 @@
+{{- /* Bundles the base stylesheet with css.Build (Hugo v0.158.0 and later),
+which inlines the @import graph and respects the layer() assignments in
+main.css. No PostCSS, no Sass, no npm.
+
+"target" is deliberately unset: nesting, @layer, oklch() and relative color
+syntax are all in the supported browser baseline, so nothing is lowered and the
+output matches what we wrote.
+
+In development the file is served unminified with a linked source map. In
+production it is minified and fingerprinted with an integrity hash. */ -}}
+{{- with resources.Get "css/main.css" -}}
+  {{- $opts := dict
+    "minify" (not hugo.IsDevelopment)
+    "sourceMap" (cond hugo.IsDevelopment "linked" "none")
+    "targetPath" "css/main.css"
+  -}}
+  {{- with . | css.Build $opts -}}
+    {{- if hugo.IsDevelopment -}}
+      <link rel="stylesheet" href="{{ .RelPermalink }}">
+    {{- else -}}
+      {{- with . | fingerprint -}}
+        <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}">
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- else -}}
+  {{- errorf "head/css.html: assets/css/main.css not found. The hugo-base module may not be mounted." -}}
+{{- end -}}

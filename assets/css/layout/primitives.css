@@ -1,0 +1,90 @@
+/* Layout primitives: arrangement without appearance.
+ *
+ * Each one does a single job, takes its spacing from the scale, and carries no
+ * color, border or font. They are intrinsic, so they respond to their content
+ * and their container rather than to viewport breakpoints.
+ *
+ * Every primitive takes a per instance override, so a component can set
+ * --stack-space or --cluster-gap instead of writing its own layout rules.
+ *
+ * Foundation file. A site must not override it. */
+
+/* Vertical rhythm. Spaces between siblings, never above the first child, so it
+ * does not fight the spacing of whatever contains it. */
+.stack {
+  display: flow-root;
+
+  > * + * {
+    margin-block-start: var(--stack-space, var(--space-3));
+  }
+}
+
+/* A row that wraps instead of overflowing. */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-gap, var(--space-2));
+  align-items: var(--cluster-align, center);
+  justify-content: var(--cluster-justify, flex-start);
+}
+
+/* Centred column with a readable width and a gutter that survives small
+ * screens. The gutter is padding, so nothing touches the edge of the display. */
+.center {
+  box-sizing: content-box;
+  max-inline-size: var(--center-width, var(--measure));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Content and a sidebar that stack when there is not enough room, with no
+ * media query: the sidebar keeps its width until the main part would drop
+ * below --sidebar-content-min, then both go full width. */
+.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sidebar-gap, var(--space-4));
+
+  > :first-child {
+    flex-basis: var(--sidebar-width, 18rem);
+    flex-grow: 1;
+  }
+
+  > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sidebar-content-min, 60%);
+  }
+}
+
+/* Equal columns that become rows below a threshold, again without a query. */
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--switcher-gap, var(--space-3));
+
+  > * {
+    flex-basis: calc((var(--switcher-threshold, 32rem) - 100%) * 999);
+    flex-grow: 1;
+  }
+}
+
+/* As many columns as fit, each at least --grid-min wide. */
+.grid-auto {
+  display: grid;
+  gap: var(--grid-gap, var(--space-3));
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--grid-min, 18rem), 100%), 1fr));
+}
+
+/* Opts an element in as a container query context, so components inside it can
+ * respond to the space they are given rather than to the viewport. */
+.container {
+  container-type: inline-size;
+  container-name: var(--container-name, layout);
+}
+
+/* Keeps long words, URLs and code from forcing horizontal scrolling, which
+ * would break reflow at 400 percent zoom. */
+.wrap-anywhere {
+  overflow-wrap: anywhere;
+}

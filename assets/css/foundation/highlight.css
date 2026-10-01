@@ -1,0 +1,90 @@
+/* Syntax highlighting, themed from the semantic tokens.
+ *
+ * Hugo's highlighter (Chroma) can either write inline hex colors or emit class
+ * names. Inline colors are a problem twice over: the built in styles are
+ * hardcoded hex, so they ignore the token system and fail contrast on our
+ * surfaces, and they cannot respond to dark mode. So a site must set
+ *
+ *   [markup.highlight]
+ *     noClasses = false
+ *
+ * and this file styles the classes instead. Every color here is a semantic
+ * token, so both schemes work and the contrast is already verified.
+ *
+ * The class names are Chroma's. Only the groups that carry meaning are styled;
+ * anything unstyled inherits the normal code color, which is the safe default.
+ *
+ * Foundation file. A site must not override it. */
+
+.highlight pre {
+  /* Chroma wraps the block, so the inner pre keeps the code surface. */
+  background-color: var(--color-surface-sunken);
+}
+
+/* Comments: muted, and italic so they read as commentary. */
+.highlight :is(.c, .ch, .cm, .c1, .cs, .cp, .cpf) {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Keywords and operators. */
+.highlight :is(.k, .kc, .kd, .kn, .kp, .kr, .kt) {
+  color: var(--color-accent);
+  font-weight: var(--weight-medium);
+}
+
+.highlight :is(.o, .ow) {
+  color: var(--color-accent);
+}
+
+/* Strings and characters. */
+.highlight :is(.s, .sa, .sb, .sc, .dl, .sd, .s2, .se, .sh, .si, .sx, .sr, .s1, .ss) {
+  color: var(--color-success-text);
+}
+
+/* Numbers and literals. */
+.highlight :is(.m, .mb, .mf, .mh, .mi, .il, .mo) {
+  color: var(--color-info-text);
+}
+
+/* Function, class and namespace names. */
+.highlight :is(.nf, .fm, .nc, .nn, .nt) {
+  color: var(--color-text);
+  font-weight: var(--weight-medium);
+}
+
+/* Variables and attributes stay plain, so a line is not a rainbow. */
+.highlight :is(.n, .na, .nv, .vc, .vg, .vi, .vm, .nb, .bp, .no, .nd, .ni, .ne, .nl, .nx, .py) {
+  color: var(--color-text);
+}
+
+/* Errors and diff markers. */
+.highlight .err {
+  color: var(--color-danger-text);
+}
+
+.highlight .gd {
+  color: var(--color-danger-text);
+}
+
+.highlight .gi {
+  color: var(--color-success-text);
+}
+
+.highlight :is(.gh, .gu) {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+}
+
+/* Line numbers, when a site turns them on. They are decoration, so they are
+ * muted and cannot be selected into a copied snippet. */
+.highlight :is(.lnt, .ln) {
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+/* The highlighted line marker, for code blocks using hl_lines. */
+.highlight .hl {
+  background-color: var(--color-accent-subtle);
+  display: block;
+}

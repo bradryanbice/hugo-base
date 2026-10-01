@@ -42,7 +42,8 @@ CI fails if a site has its own copy of any of these:
 
 - `assets/css/main.css`
 - `assets/css/tokens/scale.css`, `tokens/color.css`, `tokens/semantic.css`
-- `assets/css/foundation/**`
+- `assets/css/foundation/**` (reset, global, typography, highlight, a11y,
+  motion, print)
 - `assets/css/layout/primitives.css`
 
 To change how a site looks, write `assets/css/tokens/theme.css`. It is the one
@@ -64,6 +65,26 @@ that is a hugo-base issue, not a reason to copy a foundation file.
 
 Site specific CSS is unlayered and loads after the base, so it wins without
 specificity fights. Add it through the `head/css-site.html` partial.
+
+## Typography
+
+- Element styles come from the foundation: a site sets `--font-body`,
+  `--font-heading` or `--font-mono` in `theme.css` and nothing else changes.
+  Self hosting a font and setting `font-display` belong to the site.
+- Wrap a run of Markdown output in `.prose`. It sets the reading measure and
+  the vertical rhythm, including the tighter spacing between a heading and the
+  text it introduces. Do not put `.stack` on the same element: both add
+  spacing. Override the width per instance with `--prose-measure`.
+- Code blocks wrap instead of scrolling sideways, because a horizontal scroller
+  breaks reflow at 400 percent zoom and needs a focusable region for keyboard
+  users.
+- Syntax highlighting needs `[markup.highlight] noClasses = false` in the
+  site's config. Hugo otherwise writes hardcoded hex colors inline, which
+  ignore the tokens, fail contrast and cannot follow dark mode. The base styles
+  Chroma's classes from semantic tokens.
+- Text must reflow at 320px (400 percent zoom at 1280px) with no horizontal
+  scrolling. Long words, URLs and identifiers need `overflow-wrap`, or the
+  `.wrap-anywhere` utility.
 
 ## Contrast is checked, in both schemes
 

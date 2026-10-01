@@ -21,6 +21,8 @@
 
 @import "foundation/reset.css" layer(reset);
 @import "foundation/global.css" layer(foundation);
+@import "foundation/typography.css" layer(foundation);
+@import "foundation/highlight.css" layer(foundation);
 @import "foundation/a11y.css" layer(foundation);
 @import "foundation/motion.css" layer(foundation);
 @import "foundation/print.css" layer(foundation);

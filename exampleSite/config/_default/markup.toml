@@ -1,0 +1,9 @@
+# Chroma writes hardcoded hex colors inline unless it emits classes instead.
+# The base styles the classes from its own tokens, so both color schemes work
+# and contrast is verified. markup config does not merge from a module, so each
+# site carries this.
+
+[highlight]
+  noClasses = false
+  lineNumbersInTable = true
+  tabWidth = 2

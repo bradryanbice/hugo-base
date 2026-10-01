@@ -80,8 +80,18 @@ those. Inputs left out keep their defaults, so a theme file cannot break a
 token by omission. The base's own `tokens/theme.css` documents every input, and
 `exampleSite` ships a theme that overrides it.
 
+Fonts are inputs too: `--font-body`, `--font-heading` and `--font-mono`.
+
 Everything else in `assets/css/` is foundation: a site must not copy it, and CI
 fails if it does.
+
+One piece of config is required for syntax highlighting, because Hugo otherwise
+writes hardcoded hex colors that ignore the tokens and fail contrast:
+
+```toml
+[markup.highlight]
+  noClasses = false
+```
 
 ## Renovate
 

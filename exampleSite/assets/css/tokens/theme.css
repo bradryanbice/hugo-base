@@ -13,6 +13,9 @@
   --neutral-hue: 195;
   --neutral-chroma: 0.008;
 
+  /* Proves the font inputs: a serif for headings, the system stack for body. */
+  --font-heading: georgia, "Times New Roman", times, serif;
+
   --radius-scale: 1.5;
   --shadow-strength: 1;
 }

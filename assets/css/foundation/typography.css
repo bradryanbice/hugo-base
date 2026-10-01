@@ -1,0 +1,271 @@
+/* Typography: element defaults and the prose wrapper for Markdown output.
+ *
+ * Sizes come from the type scale, spacing from the 8pt scale, colors from the
+ * semantic tokens, and fonts from the theme inputs. Nothing here is brand
+ * specific, so a site changes fonts in tokens/theme.css rather than here.
+ *
+ * Foundation file. A site must not override it. */
+
+:root {
+  /* The stacks the font inputs fall back to. A site sets --font-body,
+   * --font-heading or --font-mono in theme.css to replace them. */
+  --font-stack-system:
+    system-ui, -apple-system, "Segoe UI", roboto, helvetica, arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-stack-mono:
+    ui-monospace, "SF Mono", monaco, consolas, "Liberation Mono", monospace;
+}
+
+body {
+  font-family: var(--font-body, var(--font-stack-system));
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  font-weight: var(--weight-normal);
+}
+
+/* Headings. Tighter leading as they get larger, and balanced wrapping so a
+ * heading does not leave one word on its own line. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading, var(--font-body, var(--font-stack-system)));
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+h2 {
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-tight);
+}
+
+h3 {
+  font-size: var(--text-lg);
+}
+
+h4 {
+  font-size: var(--text-md);
+  line-height: var(--leading-snug);
+}
+
+h5,
+h6 {
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);
+}
+
+h6 {
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-sm);
+}
+
+/* Avoids the ragged last line that hurts readability. */
+p {
+  text-wrap: pretty;
+}
+
+/* Links in running text keep their underline, because color alone fails
+ * SC 1.4.1. The offset and thickness keep descenders legible. */
+a {
+  color: var(--color-link);
+  text-decoration-line: underline;
+  text-decoration-thickness: max(0.06em, 1px);
+  text-underline-offset: 0.15em;
+}
+
+a:visited {
+  color: var(--color-link-visited);
+}
+
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration-thickness: max(0.12em, 2px);
+}
+
+/* Lists */
+ul,
+ol {
+  padding-inline-start: var(--space-3);
+}
+
+li + li {
+  margin-block-start: var(--space-1);
+}
+
+li::marker {
+  color: var(--color-text-muted);
+}
+
+/* Nested lists sit closer to their parent item. */
+li > :is(ul, ol) {
+  margin-block-start: var(--space-1);
+}
+
+dt {
+  font-weight: var(--weight-medium);
+}
+
+dd {
+  margin-inline-start: var(--space-3);
+}
+
+/* Quotes */
+blockquote {
+  border-inline-start: var(--border-thick) solid var(--color-border-strong);
+  padding-inline-start: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+blockquote cite {
+  display: block;
+  margin-block-start: var(--space-1);
+  font-size: var(--text-sm);
+  font-style: normal;
+}
+
+/* Code. Blocks wrap rather than scroll: a horizontal scroller would break
+ * reflow at 400 percent zoom (SC 1.4.10) and would need a focusable region for
+ * keyboard users. Wrapping avoids both. */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono, var(--font-stack-mono));
+  font-size: 0.9em;
+}
+
+:not(pre) > code {
+  background-color: var(--color-surface-sunken);
+  padding: 0.1em var(--space-0h);
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
+}
+
+pre {
+  background-color: var(--color-surface-sunken);
+  color: var(--color-text);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 2;
+}
+
+kbd {
+  background-color: var(--color-surface-raised);
+  border: var(--border-thin) solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-0h);
+  font-size: 0.85em;
+}
+
+/* Inline semantics */
+strong,
+b {
+  font-weight: var(--weight-bold);
+}
+
+em,
+i,
+cite,
+dfn {
+  font-style: italic;
+}
+
+small {
+  font-size: var(--text-sm);
+}
+
+mark {
+  background-color: var(--color-accent-subtle);
+  color: var(--color-text);
+  padding: 0 var(--space-0h);
+}
+
+/* An abbreviation with a title gets a visible hint that it has one. */
+abbr[title] {
+  text-decoration: underline dotted;
+  text-decoration-thickness: max(0.06em, 1px);
+  cursor: help;
+}
+
+/* Keeps sup and sub from stretching the line box. */
+sub,
+sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+}
+
+sup {
+  inset-block-start: -0.5em;
+}
+
+sub {
+  inset-block-end: -0.25em;
+}
+
+/* Tables at the element level. The scroll wrapper and caption handling come
+ * with the table shortcode and render hook. */
+caption {
+  text-align: start;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  padding-block-end: var(--space-1);
+}
+
+th,
+td {
+  text-align: start;
+  padding: var(--space-1) var(--space-2);
+  border-block-end: var(--border-thin) solid var(--color-border);
+}
+
+th {
+  font-weight: var(--weight-medium);
+}
+
+figcaption {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-block-start: var(--space-1);
+}
+
+/* Prose: rhythm and line length for a run of Markdown output.
+ *
+ * Spacing goes between siblings only, so it never fights the spacing of
+ * whatever contains it, and headings get more space above than below so they
+ * group with the text they introduce.
+ *
+ * Do not also put .stack on a .prose element: they would both add spacing. */
+.prose {
+  max-inline-size: var(--prose-measure, var(--measure));
+
+  > * + * {
+    margin-block-start: var(--space-3);
+  }
+
+  > * + :is(h2, h3, h4, h5, h6) {
+    margin-block-start: var(--space-5);
+  }
+
+  > :is(h2, h3, h4, h5, h6) + * {
+    margin-block-start: var(--space-2);
+  }
+
+  /* Wide children opt out of the reading measure. */
+  > :is(figure, table, pre, .full-width) {
+    max-inline-size: 100%;
+  }
+}

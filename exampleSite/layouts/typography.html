@@ -1,0 +1,43 @@
+{{/* Typography fixture. Renders the page's Markdown, then the elements that
+Markdown cannot express (abbr, kbd, mark, definition lists, sub and sup, figure)
+as raw HTML, so the foundation's element styles are all exercised without
+turning on unsafe HTML in content. */}}
+
+{{ define "main" }}
+  <div class="center">
+    <article class="prose">
+      <h1>{{ .Title }}</h1>
+      {{ .Content }}
+
+      <h2>Elements outside Markdown</h2>
+
+      <p>An abbreviation: <abbr title="Web Content Accessibility Guidelines">WCAG</abbr>
+        carries a dotted underline so a reader can tell it has a definition.
+        Press <kbd>Tab</kbd> then <kbd>Enter</kbd> to follow a link.
+        Some <mark>highlighted text</mark> sits on the subtle accent surface.
+        Footnote markers read as <sup>1</sup> and chemistry as H<sub>2</sub>O.
+        <small>Small print, for asides that are genuinely secondary.</small></p>
+
+      <dl>
+        <dt>Foundation</dt>
+        <dd>Owned by hugo-base. A site does not override it.</dd>
+        <dt>Theme</dt>
+        <dd>One file of inputs, owned by the site.</dd>
+      </dl>
+
+      <figure>
+        <blockquote cite="https://www.w3.org/WAI/WCAG22/Understanding/reflow.html">
+          Content can be presented without loss of information or functionality,
+          and without requiring scrolling in two dimensions.
+          <cite>WCAG 2.2, Success Criterion 1.4.10</cite>
+        </blockquote>
+        <figcaption>A figure wrapping a quotation, with its caption.</figcaption>
+      </figure>
+
+      <h2>Heading rhythm</h2>
+      <h3>Third level directly after a second</h3>
+      <p>A heading that follows another heading keeps the tighter spacing,
+        because the pair reads as one unit.</p>
+    </article>
+  </div>
+{{ end }}

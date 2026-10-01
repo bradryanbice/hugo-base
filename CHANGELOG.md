@@ -19,3 +19,7 @@ release may contain breaking changes, listed under a Breaking heading.
 - Node pinned in `mise.toml` for CI tooling.
 - Accessibility and Lighthouse gate in `tools/quality/`: axe over every sitemap URL, Lighthouse CI assertions (accessibility must score 1, byte budgets are hard limits, performance is a warning), reports uploaded as an artifact, and a self test that proves axe still fails on a broken page.
 - Pull request template with a manual accessibility checklist.
+- Shared rules in `agents/rules/` (principles, accessibility, CSS, templates, content, maintenance), scoped by path where they apply to one part of a site, plus a placeholder `hugo-base-upgrade` skill.
+- `tools/sync.py` and `tools/managed-files.toml`: copy the rules, skills, CI caller workflow, PR template, editorconfig and `hugo-base.sh` stub into a consuming site, pinned to the hugo-base version that site requires. `--check` fails on stale, missing or orphaned files and runs in CI.
+- `tools/templates/hugo-base.sh`, the per site front end that locates the pinned module and runs its sync, lint and quality tooling.
+- hugo-base loads the same rules it ships, through `.claude/rules/shared`.

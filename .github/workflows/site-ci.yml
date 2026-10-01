@@ -82,6 +82,9 @@ jobs:
         if: inputs.lint-dashes
         run: bash "${{ steps.base.outputs.dir }}/tools/ci/lint-dashes.sh"
 
+      - name: Check managed files are current
+        run: python3 "${{ steps.base.outputs.dir }}/tools/sync.py" --base "${{ steps.base.outputs.dir }}" --site "$SOURCE" --check
+
       - name: Build
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache

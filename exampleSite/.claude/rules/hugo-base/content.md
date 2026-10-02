@@ -25,9 +25,20 @@ This file is managed by hugo-base. Do not edit it inside a site.
   Hugo can process them and the base can produce responsive sizes.
 - Every image needs alt text. Write what a reader would miss if the image did
   not load. If the image is purely decorative, pass an empty alt deliberately.
-- Do not hand write `<img>` tags in content. Use a Markdown image or the
-  `figure` shortcode, both of which go through the base's image pipeline and
-  set width and height to avoid layout shift.
+- Do not hand write `<img>` tags in content. A Markdown image goes through the
+  base's pipeline, which generates WebP alternatives and several widths, never
+  upscales, and sets width and height so the page does not shift as images load.
+- Alt text is the Markdown link text: `![What the image shows](photo.jpg)`.
+  Leaving it empty says the image is decorative, which is a decision you make
+  rather than a field you forget. Omitting alt entirely, when calling the image
+  partial directly, fails the build.
+- A Markdown title becomes a real caption: `![Alt](photo.jpg "The caption")`
+  renders a `figure` with a `figcaption`, and the caption may contain Markdown.
+- SVG and GIF pass through untouched. A remote image is not processed, because
+  that would make the build depend on someone else's server.
+- `params.base.images` sets `widths`, `sizes` and `formats`. WebP only by
+  default; add `"avif"` to `formats` to opt in, at the cost of build time on
+  every width.
 
 ## Shortcodes
 

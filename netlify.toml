@@ -12,3 +12,7 @@
   HUGO_VERSION = "0.166.0"
   GO_VERSION = "1.27.1"
   TZ = "UTC"
+  # Hugo caches processed images here. Netlify persists /opt/build/cache
+  # between builds, so images are not reprocessed on every deploy. Without
+  # this, a site with many images pays the full processing cost every time.
+  HUGO_CACHEDIR = "/opt/build/cache/hugo_cache/"

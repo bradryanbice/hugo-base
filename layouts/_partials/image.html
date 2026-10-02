@@ -1,0 +1,124 @@
+{{- /* One responsive image.
+
+Context: a dict with
+
+  src            required. A page resource name, or a path under assets/.
+  alt            required, and may be "" for a decorative image. A missing alt
+                 is a build error: see below.
+  page           optional. Defaults to the current page, for resolving page
+                 resources.
+  widths         optional. Defaults to params.base.images.widths.
+  sizes          optional. Defaults to params.base.images.sizes.
+  loading        optional. "lazy" by default; pass "eager" for an image above
+                 the fold.
+  fetchpriority  optional. "high" for the one image that is the largest
+                 contentful paint.
+  class          optional. Added to the <img>.
+
+Why a missing alt stops the build: accessibility is a hard requirement here,
+and a warning would be ignored. Passing alt="" is how you say "this image is
+decorative", which is a decision the author has to make deliberately rather
+than by forgetting.
+
+An image Hugo cannot process (an SVG) passes through untouched. Hugo reports
+that with reflect.IsImageResourceProcessable, which is more reliable than a
+list of file extensions, and calling .Width on such a resource is an error
+rather than an empty value. For an SVG the dimensions are read out of the file
+so the browser can still reserve space, and a caller can always pass width and
+height explicitly.
+
+Output is a <picture> with a WebP source and a fallback in the original format.
+Every raster image gets width and height attributes, so the browser reserves
+the right space and the page does not shift as images load. */ -}}
+
+{{- $params := site.Params.base.images | default dict -}}
+{{- $src := .src -}}
+{{- $page := .page | default page -}}
+
+{{- if not (isset . "src") -}}
+  {{- errorf "image.html: called without src (page %s)" $page.Path -}}
+{{- end -}}
+{{- if not (isset . "alt") -}}
+  {{- errorf "image.html: %q has no alt text (page %s). Pass alt with a description, or alt=\"\" if the image is decorative." $src $page.Path -}}
+{{- end -}}
+
+{{- $widths := .widths | default $params.widths | default (slice 320 640 960 1280 1600) -}}
+{{- $sizes := .sizes | default $params.sizes | default "100vw" -}}
+{{- $loading := .loading | default "lazy" -}}
+{{- $formats := $params.formats | default (slice "webp") -}}
+
+{{- /* Page resources first, then assets. A remote URL or a path under static/
+     cannot be processed, so the caller gets an error rather than a silently
+     unoptimised image. */ -}}
+{{- $resource := "" -}}
+{{- with $page.Resources.GetMatch $src -}}
+  {{- $resource = . -}}
+{{- else -}}
+  {{- with resources.Get $src -}}
+    {{- $resource = . -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $resource -}}
+  {{- errorf "image.html: cannot find %q (page %s). Put it in the page bundle or under assets/, not in static/." $src $page.Path -}}
+{{- end -}}
+
+{{- if not (reflect.IsImageResourceProcessable $resource) -}}
+  {{- /* Dimensions, so even a pass through image reserves its space. Caller
+       first, then the SVG's own width and height, then its viewBox. */ -}}
+  {{- $w := .width -}}
+  {{- $h := .height -}}
+  {{- if and (not $w) (eq $resource.MediaType.SubType "svg") -}}
+    {{- $svg := $resource.Content -}}
+    {{- with findRESubmatch `(?i)<svg[^>]*\swidth="([0-9.]+)[a-z%]*"[^>]*\sheight="([0-9.]+)[a-z%]*"` $svg 1 -}}
+      {{- $w = index (index . 0) 1 -}}
+      {{- $h = index (index . 0) 2 -}}
+    {{- else -}}
+      {{- with findRESubmatch `(?i)viewBox="[0-9.\s-]*?([0-9.]+)\s+([0-9.]+)"` $svg 1 -}}
+        {{- $w = index (index . 0) 1 -}}
+        {{- $h = index (index . 0) 2 -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  <img src="{{ $resource.RelPermalink }}" alt="{{ .alt }}" loading="{{ $loading }}" decoding="async"
+    {{- with $w }} width="{{ . }}"{{ end -}}
+    {{- with $h }} height="{{ . }}"{{ end -}}
+    {{- with .class }} class="{{ . }}"{{ end -}}
+    {{- with .fetchpriority }} fetchpriority="{{ . }}"{{ end -}}
+  >
+{{- else -}}
+  {{- /* Never upscale: a 600px original rendered at 1600px is just blurry. */ -}}
+  {{- $usable := slice -}}
+  {{- range $widths -}}
+    {{- if le . $resource.Width -}}
+      {{- $usable = $usable | append . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if not $usable -}}
+    {{- $usable = slice $resource.Width -}}
+  {{- end -}}
+
+  {{- $largest := index (sort $usable "value" "desc") 0 -}}
+  {{- $fallback := $resource.Resize (printf "%dx" $largest) -}}
+
+  <picture>
+    {{- range $format := $formats }}
+      {{- $srcset := slice -}}
+      {{- range $usable -}}
+        {{- $converted := $resource.Resize (printf "%dx %s" . $format) -}}
+        {{- $srcset = $srcset | append (printf "%s %dw" $converted.RelPermalink $converted.Width) -}}
+      {{- end }}
+      <source type="image/{{ $format }}" srcset="{{ delimit $srcset ", " }}" sizes="{{ $sizes }}">
+    {{- end }}
+    {{- $srcset := slice -}}
+    {{- range $usable -}}
+      {{- $sized := $resource.Resize (printf "%dx" .) -}}
+      {{- $srcset = $srcset | append (printf "%s %dw" $sized.RelPermalink $sized.Width) -}}
+    {{- end }}
+    <img src="{{ $fallback.RelPermalink }}" srcset="{{ delimit $srcset ", " }}" sizes="{{ $sizes }}"
+      width="{{ $fallback.Width }}" height="{{ $fallback.Height }}"
+      alt="{{ .alt }}" loading="{{ $loading }}" decoding="async"
+      {{- with .class }} class="{{ . }}"{{ end -}}
+      {{- with .fetchpriority }} fetchpriority="{{ . }}"{{ end -}}
+    >
+  </picture>
+{{- end -}}

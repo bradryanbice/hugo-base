@@ -1,0 +1,4 @@
+# A small pager so exampleSite exercises pagination with few pages. This
+# category does not merge from a module, so every site carries its own.
+
+pagerSize = 3

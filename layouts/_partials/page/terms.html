@@ -1,0 +1,22 @@
+{{- /* The taxonomy terms a page belongs to, one labelled group per taxonomy.
+
+Taxonomies are site configuration, so the label comes from the taxonomy's own
+name rather than from an i18n key the base cannot know. A site with a taxonomy
+whose label needs translating overrides this partial.
+
+Each group is a list, so a screen reader announces how many terms there are.
+Renders nothing for a page with no terms. */ -}}
+
+{{- $page := . -}}
+{{- range $plural, $taxonomy := site.Taxonomies -}}
+  {{- with $page.GetTerms $plural }}
+    <div class="page-terms">
+      <h2 class="page-terms__label">{{ $plural | humanize }}</h2>
+      <ul role="list" class="page-terms__list">
+        {{- range . }}
+          <li><a href="{{ .RelPermalink }}" rel="tag">{{ .LinkTitle }}</a></li>
+        {{- end }}
+      </ul>
+    </div>
+  {{- end -}}
+{{- end -}}

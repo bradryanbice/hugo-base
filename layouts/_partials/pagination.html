@@ -1,0 +1,59 @@
+{{- /* Accessible pagination.
+
+Written here rather than using Hugo's embedded pagination partial, because this
+needs a labelled landmark, aria-current on the current page, text on the
+previous and next links, and a window that does not grow without bound.
+
+Context: the page being rendered (its .Paginator has already been built).
+
+The current page is a span, not a link: a link to the page you are already on is
+noise for a screen reader. Every number has a visually hidden "Page" prefix, so
+"3" is announced as "Page 3" rather than as a bare digit. */ -}}
+
+{{- $paginator := .Paginator -}}
+{{- if gt $paginator.TotalPages 1 -}}
+  {{- $current := $paginator.PageNumber -}}
+  {{- $total := $paginator.TotalPages -}}
+  {{- /* Show the first and last page, and a window of two either side of the
+         current one. Gaps become an ellipsis. */ -}}
+  {{- $window := 2 -}}
+  <nav class="pagination" aria-label="{{ i18n "paginationLabel" }}">
+    <ul role="list" class="pagination__list">
+      <li class="pagination__item pagination__item--previous">
+        {{- with $paginator.Prev }}
+          <a href="{{ .URL }}" rel="prev">{{ i18n "previousPage" }}</a>
+        {{- else }}
+          <span class="pagination__disabled">{{ i18n "previousPage" }}</span>
+        {{- end }}
+      </li>
+
+      {{- $lastShown := 0 -}}
+      {{- range $paginator.Pagers }}
+        {{- $number := .PageNumber -}}
+        {{- $show := or (eq $number 1) (eq $number $total) (le (math.Abs (sub $number $current)) $window) -}}
+        {{- if $show }}
+          {{- if gt $number (add $lastShown 1) }}
+            <li class="pagination__item pagination__ellipsis" aria-hidden="true">&hellip;</li>
+          {{- end }}
+          <li class="pagination__item">
+            {{- if eq $number $current }}
+              <span aria-current="page"><span class="visually-hidden">{{ i18n "pageNumber" }} </span>{{ $number }}</span>
+            {{- else }}
+              <a href="{{ .URL }}"><span class="visually-hidden">{{ i18n "pageNumber" }} </span>{{ $number }}</a>
+            {{- end }}
+          </li>
+          {{- $lastShown = $number -}}
+        {{- end }}
+      {{- end }}
+
+      <li class="pagination__item pagination__item--next">
+        {{- with $paginator.Next }}
+          <a href="{{ .URL }}" rel="next">{{ i18n "nextPage" }}</a>
+        {{- else }}
+          <span class="pagination__disabled">{{ i18n "nextPage" }}</span>
+        {{- end }}
+      </li>
+    </ul>
+    <p class="pagination__status">{{ i18n "pageXOfY" (dict "current" $current "total" $total) }}</p>
+  </nav>
+{{- end -}}

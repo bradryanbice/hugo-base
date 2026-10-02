@@ -1,0 +1,62 @@
+/* Pagination. Targets are at least 24px (WCAG 2.2 SC 2.5.8) and the current
+ * page is marked by weight and a filled box, not by color alone.
+ *
+ * Foundation file. A site must not override it. */
+
+.pagination {
+  margin-block-start: var(--space-4);
+}
+
+.pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-0h) var(--space-1);
+  padding-inline-start: 0;
+  margin-block: 0;
+}
+
+.pagination__item {
+  margin-block-start: 0;
+}
+
+.pagination__item :is(a, span) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--space-3);
+  min-block-size: var(--space-3);
+  padding: var(--space-0h) var(--space-1);
+  border-radius: var(--radius-sm);
+  text-decoration-line: none;
+}
+
+.pagination__item a {
+  color: var(--color-link);
+  border: var(--border-thin) solid var(--color-border);
+}
+
+.pagination__item a:hover {
+  color: var(--color-link-hover);
+  border-color: var(--color-border-strong);
+  text-decoration-line: underline;
+}
+
+.pagination__item [aria-current="page"] {
+  color: var(--color-on-accent);
+  background-color: var(--color-accent);
+  font-weight: var(--weight-bold);
+}
+
+/* A dimmed label rather than a disabled control when there is nowhere to go:
+ * nothing focusable that does nothing. */
+.pagination__disabled,
+.pagination__ellipsis {
+  color: var(--color-text-muted);
+}
+
+.pagination__status {
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

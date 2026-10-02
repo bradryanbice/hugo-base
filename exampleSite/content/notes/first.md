@@ -1,7 +1,9 @@
 ---
 title: A note inside a section
 description: Viewing this page marks the Notes menu entry as an ancestor, not as the current page.
-date: 2026-10-01
+date: 2026-01-05
+tags: ["tokens", "tooling"]
+lastmod: 2026-02-01
 ---
 
 Reading this page, the Notes entry in the navigation carries

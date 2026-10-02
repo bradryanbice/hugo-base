@@ -34,6 +34,28 @@ Other version facts worth remembering:
 - Verify anything else against the current docs at gohugo.io. Do not trust
   memory for template names, config keys or function signatures.
 
+## What the base ships
+
+| Template | Covers |
+|---|---|
+| `baseof.html` | the shell: landmarks, skip link, header, footer, hooks |
+| `single.html` | any single page |
+| `list.html` | every list kind: home, section, taxonomy, term |
+| `404.html` | not found, with a search seam |
+
+There is no `home.html`. Hugo falls back from the home kind to `list.html`, so
+a site that wants a different home page adds its own `home.html`, and one that
+wants a different section listing adds `section.html`. Same for `taxonomy.html`
+and `term.html`.
+
+Overridable pieces: `pagination.html`, `page/meta.html`, `page/card.html`
+(takes a `headingLevel`, so a card fits the outline rather than hard coding
+`h2`), `page/terms.html` and `page/search.html`.
+
+`params.base.dateFormat` sets the date format, defaulting to `:date_long`.
+Format dates with the `time.Format` function, not the `.Format` method: only
+`time.Format` understands Hugo's layout tokens and localises the result.
+
 ## Overriding base templates
 
 - Put site specific types at their own paths, for example
@@ -64,6 +86,15 @@ Other version facts worth remembering:
   touching a template.
 - Replacing a single sub partial (for example `head/social.html`) is supported.
   Copying `head.html` to change one line is not.
+
+## Migrating an older site
+
+Hugo still honours the pre v0.146 paths, and it does so silently. A site that
+keeps `layouts/_default/single.html` or `layouts/partials/` will have those win
+over the base, with no warning, so the site looks like it adopted hugo-base
+while still rendering its own templates. Before adopting, delete whatever the
+base now provides and move anything genuinely site specific to the current
+paths.
 
 ## Build discipline
 

@@ -1,0 +1,22 @@
+{{- /* One page in a list.
+
+Context: a dict with
+  page          the page to summarise
+  headingLevel  the heading level to render, so the card fits the document
+                outline instead of hard coding h2
+
+The link wraps the title only, not the whole card: a link containing a date and
+a summary is announced as one long run of text, and it stops a reader selecting
+the text inside. */ -}}
+
+{{- $page := .page -}}
+{{- $level := .headingLevel | default 2 -}}
+<article class="card">
+  <h{{ $level }} class="card__title">
+    <a href="{{ $page.RelPermalink }}">{{ $page.LinkTitle }}</a>
+  </h{{ $level }}>
+  {{ partial "page/meta.html" $page }}
+  {{- with $page.Description | default $page.Summary }}
+    <p class="card__summary">{{ . }}</p>
+  {{- end }}
+</article>

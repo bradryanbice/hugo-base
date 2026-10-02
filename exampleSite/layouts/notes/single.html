@@ -1,0 +1,18 @@
+{{/* A section specific layout, to prove the documented override order: Hugo
+prefers layouts/notes/single.html in the site over single.html from the base,
+for pages in the notes section only. A real site would use this for a content
+type with its own shape. */}}
+
+{{ define "main" }}
+  <div class="center">
+    <article class="prose">
+      <p class="page-meta" data-site-override="notes-single">
+        {{ i18n "mainNavigation" }}: <a href="{{ .CurrentSection.RelPermalink }}">{{ .CurrentSection.LinkTitle }}</a>
+      </p>
+      <h1>{{ .Title }}</h1>
+      {{ partial "page/meta.html" . }}
+      {{ .Content }}
+      {{ partial "page/terms.html" . }}
+    </article>
+  </div>
+{{ end }}

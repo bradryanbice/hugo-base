@@ -28,6 +28,9 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Content layouts: `single.html`, `list.html` (home, section, taxonomy and term) and `404.html`, with `page/meta.html`, `page/card.html`, `page/terms.html` and a `page/search.html` seam. No `home.html`: the home kind falls back to `list.html`, so a site adds its own only if it wants something different.
+- Accessible pagination: a labelled landmark, `aria-current="page"` on the current page, a hidden "Page" prefix on each number, text on previous and next, a windowed page list, and a status line. The current page and unavailable directions are text rather than focusable controls.
+- Card and pagination components, both adjustable through component level custom properties.
 - Page shell: `baseof.html` with one banner, main and contentinfo landmark per page, a skip link that moves focus into `<main>`, a header with a brand link and a logo seam, a recursive nav that renders only menus the site defines, and a footer with an optional menu and copyright line.
 - Five hook partials (`head-end`, `body-start`, `header-end`, `footer-start`, `body-end`) as the shell's extension API, plus `i18n/en.toml` for every user visible string.
 - `layout/shell.css`: skip link, header, nav and footer, arranged with a container query and no JavaScript.

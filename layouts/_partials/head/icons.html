@@ -1,0 +1,14 @@
+{{- /* Seam for favicons and a web app manifest.
+
+Icons are brand assets, so they belong to the site. Override this partial and
+emit whatever set you need, for example:
+
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+A site with no icons gets a console 404 for /favicon.ico from the browser, which
+costs a point in Lighthouse's best practices score, so ship at least one.
+
+Renders nothing by default. */ -}}

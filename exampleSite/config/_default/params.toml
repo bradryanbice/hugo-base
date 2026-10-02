@@ -1,0 +1,16 @@
+# Site params. Everything the base reads lives under params.base, so it cannot
+# collide with a site's own params.
+
+description = "The test harness for hugo-base: every template, partial and token, exercised and checked."
+
+[social]
+  twitter = "example"
+
+[base]
+  titleSeparator = "|"
+
+[base.schema]
+  type = "Organization"
+  name = "hugo-base example"
+  logo = "/icon.svg"
+  author = "Example Author"

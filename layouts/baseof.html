@@ -1,12 +1,7 @@
 <!doctype html>
 <html lang="{{ site.Language.Locale }}" dir="{{ or site.Language.Direction "ltr" }}">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}</title>
-  {{ partial "head/css.html" . }}
-  {{ partial "head/css-site.html" . }}
-  {{ partial "hooks/head-end.html" . }}
+  {{ partial "head.html" . }}
 </head>
 <body>
   {{ partial "hooks/body-start.html" . }}

@@ -87,6 +87,49 @@ Format dates with the `time.Format` function, not the `.Format` method: only
 - Replacing a single sub partial (for example `head/social.html`) is supported.
   Copying `head.html` to change one line is not.
 
+## The document head
+
+`head.html` composes small partials, each replaceable on its own: `head/meta.html`,
+`head/canonical.html`, `head/social.html`, `head/feeds.html`, `head/icons.html`,
+`head/schema.html`, `head/css.html`, `head/css-site.html`. Never copy
+`head.html` to change one of them.
+
+Every page must end up with exactly one title, one canonical link, a meta
+description and one `h1`, and any JSON-LD must parse. The gate checks all of
+that on every built page, so a template that drops a description fails CI.
+
+What a site configures:
+
+```toml
+disableHugoGeneratorInject = true   # so <meta charset> stays first
+
+[params]
+  description = "..."               # fallback description
+  [params.social]
+    twitter = "handle"              # used by the X card tags
+  [params.base]
+    titleSeparator = "|"
+    themeColor = "..."
+  [params.base.schema]
+    type = "Organization"           # or Person
+    name = "..."                    # publisher
+    logo = "/icon.svg"
+    author = "..."                  # default author
+```
+
+The base ships no defaults for publisher or author: an invented organization
+name would be worse than an absent field.
+
+- Front matter `noindex: true` emits `noindex, follow`. Pair it with
+  `sitemap.disable`, which the gate enforces.
+- Ship at least one icon by overriding `head/icons.html`. Without one the
+  browser requests `/favicon.ico`, logs a 404 and costs a Lighthouse point.
+- Social tags come from Hugo's embedded templates, which read `params.social`
+  and the page's `images`, `audio` and `videos` front matter.
+- Inside a `<script>` element, JSON needs `jsonify | safeJS`. Without `safeJS`
+  Go's template escaping emits it as a quoted string, which parses as a string
+  rather than an object, and nothing visibly breaks.
+
 ## Migrating an older site
 
 Hugo still honours the pre v0.146 paths, and it does so silently. A site that

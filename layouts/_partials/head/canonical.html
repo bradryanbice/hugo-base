@@ -1,0 +1,9 @@
+{{- /* The canonical URL for this page, and alternates for its translations.
+
+Paginated pages are canonical to themselves, not to the first page: each pager
+lists different content, so pointing them all at page one would hide most of an
+archive from search engines. */ -}}
+<link rel="canonical" href="{{ .Permalink }}">
+{{- range .Translations }}
+<link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}">
+{{- end }}

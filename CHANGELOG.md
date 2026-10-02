@@ -15,8 +15,18 @@ internal.
 
 ## Unreleased
 
-Migration: [`migrations/v0.1.0.md`](migrations/v0.1.0.md), for adopting the
-base in a site that already exists.
+Nothing yet.
+
+## v0.1.0 (2026-10-02)
+
+First release. Nothing to upgrade from, so there are no breaking changes.
+
+Adopting the base in a site that already exists needs work in that site:
+see [`migrations/v0.1.0.md`](migrations/v0.1.0.md), which covers the parts that
+fail quietly (old layout paths that shadow the base) as well as the parts that
+fail loudly (images in `static/`, missing alt text, renamed config keys).
+
+Requires Hugo 0.166.0 or later.
 
 ### Added
 

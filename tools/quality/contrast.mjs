@@ -88,6 +88,17 @@ try {
   if (!response || !response.ok()) {
     throw new Error(`could not load ${args.url}`);
   }
+  // Every token read below comes from the stylesheet, so it has to be applied
+  // first. Otherwise the probe measures browser defaults and reports nonsense.
+  try {
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('link[rel="stylesheet"]')].every((link) => link.sheet),
+      undefined,
+      { timeout: 15000 },
+    );
+  } catch {
+    throw new Error(`stylesheets never applied on ${args.url}, so token values cannot be read`);
+  }
   rows = await page.evaluate((pairs) => {
     // Two probes under parents with different inherited colors. A token that
     // resolves gives the same computed color in both. One that fails to

@@ -1,15 +1,29 @@
+{{/* Every list kind: the home page, sections, taxonomies and terms.
+
+Hugo's lookup puts a page kind template above this one, so a site that wants a
+different home page adds home.html, and a different section listing adds
+section.html. The base ships only this one, because the shape is the same.
+
+Pagination applies to the pages this list shows. .Paginate can only be called
+once per page, so it happens here and the partial just renders the result. */}}
+
 {{ define "main" }}
+  {{ $paginator := .Paginate .Pages }}
   <div class="center stack">
     <div class="prose">
       <h1>{{ .Title }}</h1>
       {{ .Content }}
     </div>
-    {{ with .Pages }}
-      <ul role="list">
+
+    {{ with $paginator.Pages }}
+      <ul role="list" class="card-list">
         {{ range . }}
-          <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+          <li>{{ partial "page/card.html" (dict "page" . "headingLevel" 2) }}</li>
         {{ end }}
       </ul>
+      {{ partial "pagination.html" $ }}
+    {{ else }}
+      <p>{{ i18n "noPages" }}</p>
     {{ end }}
   </div>
 {{ end }}

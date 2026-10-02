@@ -1,0 +1,21 @@
+{{- /* Publication metadata for a page: when it was published, and when it was
+last changed if that is a different day.
+
+Both are <time datetime> with a machine readable attribute, so the date is
+unambiguous whatever format the site displays. Renders nothing for a page with
+no date, such as a section index. */ -}}
+
+{{- /* time.Format, not the .Format method: it understands Hugo's layout tokens
+     such as :date_long and localises the result to the site language. */ -}}
+{{- $format := site.Params.base.dateFormat | default ":date_long" -}}
+{{- if not .Date.IsZero }}
+  <p class="page-meta">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ time.Format $format .Date }}</time>
+    {{- if and (not .Lastmod.IsZero) (ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02")) }}
+      <span class="page-meta__updated">
+        {{ i18n "updated" }}
+        <time datetime="{{ .Lastmod.Format "2006-01-02" }}">{{ time.Format $format .Lastmod }}</time>
+      </span>
+    {{- end }}
+  </p>
+{{- end -}}

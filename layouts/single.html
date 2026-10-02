@@ -1,8 +1,14 @@
+{{/* A single page of any type. Nothing here is specific to a content type: a
+site adds layouts/<section>/single.html for its own, rather than overriding
+this one. */}}
+
 {{ define "main" }}
   <div class="center">
     <article class="prose">
       <h1>{{ .Title }}</h1>
+      {{ partial "page/meta.html" . }}
       {{ .Content }}
+      {{ partial "page/terms.html" . }}
     </article>
   </div>
 {{ end }}

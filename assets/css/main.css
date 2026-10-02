@@ -33,3 +33,6 @@
 
 @import "layout/primitives.css" layer(layout);
 @import "layout/shell.css" layer(layout);
+
+@import "components/card.css" layer(components);
+@import "components/pagination.css" layer(components);

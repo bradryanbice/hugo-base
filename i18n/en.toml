@@ -4,3 +4,19 @@
 skipToContent = "Skip to content"
 mainNavigation = "Main"
 footerNavigation = "Footer"
+
+# Lists and pagination
+noPages = "Nothing here yet."
+paginationLabel = "Pagination"
+previousPage = "Previous"
+nextPage = "Next"
+pageNumber = "Page"
+pageXOfY = "Page {{ .current }} of {{ .total }}"
+
+# Page metadata
+updated = "Updated"
+
+# Not found
+notFoundTitle = "Page not found"
+notFoundBody = "That page does not exist, or it moved."
+backToHome = "Back to the home page"

@@ -1,0 +1,16 @@
+{{/* Not found. Hugo renders this to /404.html, which Netlify serves
+automatically for unmatched paths.
+
+Kept deliberately plain: a reader who lands here needs a way out, not a design.
+The search seam is where a site adds its own search form. */}}
+
+{{ define "main" }}
+  <div class="center">
+    <div class="prose">
+      <h1>{{ i18n "notFoundTitle" }}</h1>
+      <p>{{ i18n "notFoundBody" }}</p>
+      {{ partial "page/search.html" . }}
+      <p><a href="{{ site.Home.RelPermalink }}">{{ i18n "backToHome" }}</a></p>
+    </div>
+  </div>
+{{ end }}

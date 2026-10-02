@@ -5,7 +5,13 @@ All notable changes to hugo-base are recorded here. The format follows
 [semantic versioning](https://semver.org/). While the version is 0.x, a minor
 release may contain breaking changes, listed under a Breaking heading.
 
+Releases that need work in a consuming site link their migration note. Apply
+one with the `hugo-base-upgrade` skill, or read `migrations/vX.Y.Z.md`.
+
 ## Unreleased
+
+Migration: [`migrations/v0.1.0.md`](migrations/v0.1.0.md), for adopting the
+base in a site that already exists.
 
 ### Added
 
@@ -28,6 +34,9 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- `migrations/` with a documented format, and `v0.1.0.md`: the adoption migration for an existing site, covering legacy layout paths that silently shadow the base, images in `static/`, missing alt text, the v0.158 config key renames, the three `_merge` opt in files, root keys, and the toolchain pins.
+- The `hugo-base-upgrade` skill, filled in: move the module, sync managed files, read and apply the migrations in range, verify in order, and stop rather than deciding a brand color or whether a template is site specific.
+- A migration notice on a pull request that changes the pinned hugo-base version, listing what it crosses and which notes are breaking.
 - Archetypes: `default.md` and a `bundle` kind for a page with images, both with the front matter the base expects and a note on what to fill in.
 - Template coverage is now enforced: the build runs with `--printUnusedTemplates` and `--printPathWarnings` under `--panicOnWarning`, so a template nothing renders fails CI rather than going untested.
 - `tools/ci/check-harness.sh` asserts exampleSite still exercises every override path (theme inputs, a hook, a partial, a section layout) and the behaviour fixtures (noindex, images, shortcodes, pagination, drafts staying unpublished).

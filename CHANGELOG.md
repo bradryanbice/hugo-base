@@ -17,6 +17,14 @@ internal.
 
 Nothing yet.
 
+## v0.1.1 (2026-10-02)
+
+No migration needed.
+
+### Fixed
+
+- A brand new site failed its first CI run. With no icons, the browser requests `/favicon.ico`, logs a 404 and costs a Lighthouse best practices point, so a site that followed the quick start exactly was red on day one. `head/icons.html` now emits an empty icon link, which suppresses the request without making a design decision for the site. A site still overrides that partial once it has real icons. Found by the v0.1.0 smoke test.
+
 ## v0.1.0 (2026-10-02)
 
 First release. Nothing to upgrade from, so there are no breaking changes.

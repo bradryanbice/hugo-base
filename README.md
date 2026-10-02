@@ -72,6 +72,10 @@ And point Renovate at the shared preset:
 }
 ```
 
+Ship real icons when you have them, by overriding `head/icons.html`. Until
+then the base emits an empty icon link, so the browser does not request a
+favicon that does not exist.
+
 Never run `go mod tidy` in a Hugo site. There is no Go code, so it would drop
 the hugo-base requirement. Use `hugo mod tidy`.
 
@@ -131,7 +135,7 @@ content type. The base ships `baseof.html`, `single.html`, `list.html` and
 | Partial | Purpose |
 |---|---|
 | `_partials/site/logo.html` | a mark inside the brand link |
-| `_partials/head/icons.html` | favicons and manifest |
+| `_partials/head/icons.html` | favicons and manifest (ships an empty icon link, so a site with no icons yet does not 404) |
 | `_partials/head/css-site.html` | a site's own stylesheet |
 | `_partials/page/search.html` | a search form on the 404 page |
 

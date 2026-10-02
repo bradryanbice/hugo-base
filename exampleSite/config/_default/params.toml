@@ -9,6 +9,17 @@ description = "The test harness for hugo-base: every template, partial and token
 [base]
   titleSeparator = "|"
 
+[base.images]
+  # Widths to generate. The pipeline never upscales, so an image smaller than
+  # the largest width simply gets fewer sources.
+  widths = [320, 640, 960, 1280, 1600]
+  # Images sit inside the reading measure on this site, so they are never wider
+  # than the prose column.
+  sizes = "(min-width: 48rem) 42rem, calc(100vw - 2rem)"
+  # WebP only. AVIF is smaller again but costs build time on every width, so a
+  # site opts in: formats = ["avif", "webp"].
+  formats = ["webp"]
+
 [base.schema]
   type = "Organization"
   name = "hugo-base example"

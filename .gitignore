@@ -1,5 +1,7 @@
-public/
-resources/_gen/
+# Leading pattern without a slash prefix matches at any depth. "resources/_gen/"
+# alone would only match the repo root, not exampleSite/resources/_gen/.
+**/public/
+**/resources/_gen/
 .hugo_build.lock
 node_modules/
 .DS_Store

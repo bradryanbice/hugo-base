@@ -97,9 +97,18 @@ done
 
 echo
 echo "Running Lighthouse CI"
+# Explicit URLs against the server already running, rather than Lighthouse's
+# own directory discovery: that picked an arbitrary handful and missed the page
+# with images, so nothing gated image weight or layout shift.
+lh_args=""
+for url in $(python3 "$workdir/lh-urls.py" "$public" "http://127.0.0.1:$site_port"); do
+  echo "  auditing $url"
+  lh_args="$lh_args --collect.url=$url"
+done
+# shellcheck disable=SC2086
 "$workdir/node_modules/.bin/lhci" autorun \
   --config="$workdir/lighthouserc.json" \
-  --collect.staticDistDir="$public" \
+  $lh_args \
   --upload.outputDir="$report_dir/lighthouse"
 
 if [ "$skip_self_test" = "no" ]; then

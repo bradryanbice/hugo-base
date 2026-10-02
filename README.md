@@ -60,6 +60,29 @@ site copy of a foundation file. The config lives in the module, so a rule added
 here reaches a site in the same pull request that bumps hugo-base. `--self-test`
 lints a deliberately broken fixture and requires every rule to fire.
 
+## Images
+
+A Markdown image goes through the pipeline:
+
+```markdown
+![What the image shows](photo.jpg)
+![What the image shows](photo.jpg "A caption, which may contain Markdown.")
+```
+
+It generates WebP alternatives and several widths, never upscales, and always
+sets width and height so the page does not shift while loading. A title becomes
+a `figcaption`. Call `partial "image.html"` directly for finer control
+(`loading`, `fetchpriority`, `class`).
+
+Omitting alt text **fails the build**, naming the image and the page.
+`alt=""` is how you mark an image decorative, deliberately.
+
+Tune with `params.base.images`: `widths`, `sizes`, and `formats` (WebP only by
+default; add `"avif"` to opt in, at a build time cost on every width).
+
+Keep the image cache between deploys. `netlify.toml` sets `HUGO_CACHEDIR` to a
+path Netlify persists, which matters once a site has many images.
+
 ## Config contract
 
 Most Hugo configuration categories do not merge from a module into a site, so

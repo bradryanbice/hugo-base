@@ -1,0 +1,33 @@
+{{- /* Markdown images go through the image pipeline.
+
+    ![A description](photo.jpg)
+    ![A description](photo.jpg "A caption")
+
+The alt text is the Markdown link text, which authors already understand. A
+title becomes a real <figcaption> rather than a title attribute: title text is
+invisible to touch users and inconsistently announced by screen readers, while
+a caption is neither.
+
+A remote image passes through as a plain <img>, because Hugo cannot process it
+without fetching it at build time, which would make builds depend on someone
+else's server. The alt text is still required. */ -}}
+
+{{- $isRemote := or (hasPrefix .Destination "http://") (hasPrefix .Destination "https://") -}}
+
+{{- if $isRemote -}}
+  <img src="{{ .Destination | safeURL }}" alt="{{ .Text }}" loading="lazy" decoding="async">
+{{- else -}}
+  {{- $image := partial "image.html" (dict
+    "src" .Destination
+    "alt" .Text
+    "page" .Page
+  ) -}}
+  {{- with .Title -}}
+    <figure>
+      {{ $image }}
+      <figcaption>{{ . | $.Page.RenderString }}</figcaption>
+    </figure>
+  {{- else -}}
+    {{ $image }}
+  {{- end -}}
+{{- end -}}

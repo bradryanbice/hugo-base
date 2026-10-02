@@ -33,6 +33,16 @@
     autoHeadingID = true
     autoHeadingIDType = "github"
 
+  [markup.goldmark.extensions]
+    # Hugo renders "- [x] done" as a bare <input type="checkbox" disabled>,
+    # which is a form control with no label: axe reports it as a critical
+    # violation and a screen reader announces an unnamed checkbox. CSS cannot
+    # add a name, and Goldmark exposes no render hook for list items, so the
+    # extension stays off until Hugo offers a way to render it accessibly.
+    # Authors write the state as words instead: "Done: ..." or a definition
+    # list. Tracked in the base's issue list.
+    taskList = false
+
   [markup.goldmark.extensions.typographer]
     # Smart quotes and ellipses are welcome. The dash substitutions are not:
     # Hugo would turn "--" into an en dash and "---" into an em dash, which

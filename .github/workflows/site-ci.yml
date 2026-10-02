@@ -31,6 +31,12 @@ on:
           Defaults to the site itself. hugo-base passes its own root too.
         type: string
         default: ""
+      harness-check:
+        description: >
+          Assert hugo-base's own harness still exercises every override path.
+          Only meaningful in the hugo-base repo.
+        type: boolean
+        default: false
       lint-self-test:
         description: >
           Also require every policy rule to fire on the lint's broken fixture.
@@ -109,6 +115,10 @@ jobs:
           path: ${{ inputs.source }}/public
           if-no-files-found: error
           retention-days: 7
+
+      - name: Harness coverage
+        if: inputs.harness-check
+        run: bash "${{ steps.base.outputs.dir }}/tools/ci/check-harness.sh" "$SOURCE/public"
 
       - name: CSS policy lint
         env:

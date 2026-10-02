@@ -24,6 +24,7 @@ jobs:
       # The base's own CSS plus the harness, and prove the lint rules fire.
       lint-dirs: ". exampleSite"
       lint-self-test: true
+      harness-check: true
 
   renovate-config:
     name: Renovate config

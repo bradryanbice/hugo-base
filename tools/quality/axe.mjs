@@ -66,6 +66,30 @@ function formatViolation(violation) {
   return lines.join("\n");
 }
 
+// Wait until every stylesheet the page declares has actually been applied.
+//
+// Without this the check is racy: axe (and the contrast probe) can sample a
+// page whose author CSS has not landed yet, and then measure the browser's
+// default colors. That produced a dark mode contrast failure in CI that did
+// not reproduce locally and passed on the next run, which is the worst kind of
+// gate failure: it teaches people to re-run rather than to look.
+//
+// A page with no stylesheet links (the self test fixture) passes immediately.
+async function waitForStylesheets(page, url) {
+  try {
+    await page.waitForFunction(
+      () => [...document.querySelectorAll('link[rel="stylesheet"]')].every((link) => link.sheet),
+      undefined,
+      { timeout: 15000 },
+    );
+  } catch {
+    throw new Error(
+      `stylesheets never applied on ${url}. The page declares a stylesheet that did not load, ` +
+        "so any color result would be the browser's defaults rather than the site's.",
+    );
+  }
+}
+
 async function launch() {
   // Use the Chrome installed on the machine. Fall back to any Chromium
   // Playwright has, so a contributor without Chrome still gets a clear path.
@@ -106,6 +130,9 @@ try {
   for (const url of urls) {
     const page = await context.newPage();
     const response = await page.goto(url, { waitUntil: "load" });
+    if (response && response.ok()) {
+      await waitForStylesheets(page, url);
+    }
     if (!response || !response.ok()) {
       console.error(`FAIL ${url}: HTTP ${response ? response.status() : "no response"}`);
       violationCount += 1;

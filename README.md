@@ -66,7 +66,9 @@ lints a deliberately broken fixture and requires every rule to fire.
 bash tools/quality/run.sh exampleSite/public
 ```
 
-This serves the built site, runs axe over every URL in its sitemap (WCAG 2.0,
+This checks the head contract on every page (one title, one canonical, a
+description, one `h1`, parseable JSON-LD), serves the built site, runs axe over
+every URL in its sitemap (WCAG 2.0,
 2.1 and 2.2 A and AA) in both light and dark mode, checks every semantic color
 pair in the token contract for contrast, runs Lighthouse CI against the
 assertions in `tools/quality/lighthouserc.json`, and then self tests by

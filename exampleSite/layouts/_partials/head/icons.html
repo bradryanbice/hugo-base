@@ -1,0 +1,5 @@
+{{- /* Overrides the base's empty icons seam. Icons are brand assets, so each
+site ships its own. One SVG covers modern browsers and stops the browser
+requesting /favicon.ico, which would otherwise log a 404 and cost a Lighthouse
+best practices point. */ -}}
+<link rel="icon" href="{{ "icon.svg" | relURL }}" type="image/svg+xml">

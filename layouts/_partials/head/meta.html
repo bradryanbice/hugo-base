@@ -1,0 +1,39 @@
+{{- /* Core metadata: charset, viewport, title, description, robots, theme color.
+
+charset comes first and nothing precedes it, which is why the recommended site
+config sets disableHugoGeneratorInject: Hugo otherwise injects its generator tag
+ahead of everything, and charset must appear early in the document.
+
+The description falls back from the page's own description to its summary, then
+to the site description, so a page always has one. Lighthouse checks for it and
+it is what search results and link previews quote.
+
+Front matter `noindex: true` keeps a page out of search results. Pair it with
+`sitemap.disable` so the page is not advertised in the sitemap either. */ -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{ hugo.Generator }}
+
+<title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} {{ site.Params.base.titleSeparator | default "|" }} {{ site.Title }}{{ end }}</title>
+
+{{- $description := "" -}}
+{{- with .Description -}}
+  {{- $description = . -}}
+{{- else -}}
+  {{- with .Summary -}}
+    {{- $description = . -}}
+  {{- else -}}
+    {{- $description = site.Params.description -}}
+  {{- end -}}
+{{- end }}
+{{- with $description }}
+<meta name="description" content="{{ . | plainify | htmlUnescape | chomp }}">
+{{- end }}
+
+{{- if .Params.noindex }}
+<meta name="robots" content="noindex, follow">
+{{- end }}
+
+{{- with site.Params.base.themeColor }}
+<meta name="theme-color" content="{{ . }}">
+{{- end }}

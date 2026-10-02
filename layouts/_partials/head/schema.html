@@ -1,0 +1,116 @@
+{{- /* Structured data as JSON-LD.
+
+Built with dict and jsonify, never by concatenating strings: a title containing
+a quote or an ampersand would otherwise produce invalid JSON, and that is a bug
+you only find when a crawler stops trusting the site.
+
+safeJS is required: inside a <script> element Go's template escaping treats the
+value as JavaScript and would emit the JSON as a quoted string literal, which
+parses as a string rather than an object. jsonify escapes <, > and & to \u
+sequences, so the content still cannot break out of the element.
+
+What it emits:
+  home          WebSite
+  single page   Article when the page has a date, otherwise WebPage
+  list pages    CollectionPage
+  every page    BreadcrumbList from the section ancestry, except the home page
+
+Publisher and author come from params.base.schema. The base supplies no
+defaults: inventing an organization name for a site would be worse than
+omitting the field, which crawlers treat as simply absent.
+
+  [params.base.schema]
+    type = "Organization"   # or "Person"
+    name = "..."            # publisher name
+    logo = "/logo.png"      # absolute path or full URL
+    author = "..."          # default author name
+
+A page can override the author with `author` in front matter. */ -}}
+
+{{- $schema := site.Params.base.schema | default dict -}}
+
+{{- /* Publisher, used by Article and WebSite. Omitted entirely when a site has
+     not configured one. */ -}}
+{{- $publisher := dict -}}
+{{- with $schema.name }}
+  {{- $publisher = dict "@type" ($schema.type | default "Organization") "name" . -}}
+  {{- with $schema.logo }}
+    {{- $publisher = merge $publisher (dict "logo" (dict "@type" "ImageObject" "url" (. | absURL))) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $data := dict "@context" "https://schema.org" -}}
+
+{{- if .IsHome -}}
+  {{- $data = merge $data (dict
+    "@type" "WebSite"
+    "name" site.Title
+    "url" .Permalink
+    "inLanguage" site.Language.Locale
+  ) -}}
+  {{- with site.Params.description }}
+    {{- $data = merge $data (dict "description" .) -}}
+  {{- end -}}
+  {{- with $publisher }}
+    {{- $data = merge $data (dict "publisher" .) -}}
+  {{- end -}}
+{{- else if eq .Kind "page" -}}
+  {{- $type := cond (not .Date.IsZero) "Article" "WebPage" -}}
+  {{- $data = merge $data (dict
+    "@type" $type
+    "headline" .Title
+    "url" .Permalink
+    "inLanguage" site.Language.Locale
+    "mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink)
+  ) -}}
+  {{- with .Description | default .Summary }}
+    {{- $data = merge $data (dict "description" (. | plainify | chomp)) -}}
+  {{- end -}}
+  {{- if not .Date.IsZero }}
+    {{- $data = merge $data (dict "datePublished" (.Date.Format "2006-01-02")) -}}
+    {{- if not .Lastmod.IsZero }}
+      {{- $data = merge $data (dict "dateModified" (.Lastmod.Format "2006-01-02")) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- with .Params.author | default $schema.author }}
+    {{- $data = merge $data (dict "author" (dict "@type" "Person" "name" .)) -}}
+  {{- end -}}
+  {{- with $publisher }}
+    {{- $data = merge $data (dict "publisher" .) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $data = merge $data (dict
+    "@type" "CollectionPage"
+    "name" .Title
+    "url" .Permalink
+    "inLanguage" site.Language.Locale
+  ) -}}
+  {{- with .Description }}
+    {{- $data = merge $data (dict "description" .) -}}
+  {{- end -}}
+{{- end -}}
+
+<script type="application/ld+json">{{ $data | jsonify | safeJS }}</script>
+
+{{- /* Breadcrumbs, from the page's ancestors. The home page has no trail. */ -}}
+{{- if not .IsHome -}}
+  {{- $items := slice -}}
+  {{- $position := 1 -}}
+  {{- range .Ancestors.Reverse -}}
+    {{- $items = $items | append (dict
+      "@type" "ListItem"
+      "position" $position
+      "name" (cond .IsHome site.Title .LinkTitle)
+      "item" .Permalink
+    ) -}}
+    {{- $position = add $position 1 -}}
+  {{- end -}}
+  {{- $items = $items | append (dict
+    "@type" "ListItem"
+    "position" $position
+    "name" .LinkTitle
+    "item" .Permalink
+  ) -}}
+  {{- $crumbs := dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $items -}}
+<script type="application/ld+json">{{ $crumbs | jsonify | safeJS }}</script>
+{{- end -}}

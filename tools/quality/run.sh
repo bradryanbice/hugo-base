@@ -7,10 +7,11 @@
 # Steps:
 #   1. install the pinned tooling (copied out of the module, which is read only)
 #   2. serve the built site locally
-#   3. run axe over every URL in the site's sitemap, and check the semantic
+#   3. check the head contract (title, canonical, description, one h1, JSON-LD)
+#   4. run axe over every URL in the site's sitemap, and check the semantic
 #      color token contract, in both light and dark mode
-#   4. run Lighthouse CI with the assertions in lighthouserc.json
-#   5. self test: serve a deliberately broken page and require axe to fail on it
+#   5. run Lighthouse CI with the assertions in lighthouserc.json
+#   6. self test: serve a deliberately broken page and require axe to fail on it
 #
 # Chrome comes from the machine. No browser is downloaded.
 # Written for bash 3.2 so it behaves the same on macOS.
@@ -67,6 +68,10 @@ serve() {
 
 echo "Installing quality tooling"
 (cd "$workdir" && npm ci --no-audit --no-fund --loglevel=error)
+
+echo
+echo "Checking the head contract"
+python3 "$workdir/check-head.py" "$public"
 
 site_port=$(free_port)
 serve "$public" "$site_port"

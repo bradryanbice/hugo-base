@@ -28,6 +28,11 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Document head built from replaceable partials: core meta with a description fallback chain, canonical and translation alternates, Open Graph and X cards via Hugo's embedded templates, feed discovery driven by the page's own output formats, an icons seam, and JSON-LD.
+- JSON-LD structured data: `WebSite` on the home page, `Article` or `WebPage` on single pages, `CollectionPage` on lists, and a `BreadcrumbList` from the section ancestry. Publisher and author come from `params.base.schema`, with no invented defaults.
+- Front matter `noindex` support, paired with `sitemap.disable`.
+- `tools/quality/check-head.py` in the gate: one title, one canonical, a description, one `h1`, parseable JSON-LD, and no noindex page listed in the sitemap, on every built page.
+- Lighthouse SEO and best practices thresholds raised to 1 now that descriptions and an icon are in place.
 - Content layouts: `single.html`, `list.html` (home, section, taxonomy and term) and `404.html`, with `page/meta.html`, `page/card.html`, `page/terms.html` and a `page/search.html` seam. No `home.html`: the home kind falls back to `list.html`, so a site adds its own only if it wants something different.
 - Accessible pagination: a labelled landmark, `aria-current="page"` on the current page, a hidden "Page" prefix on each number, text on previous and next, a windowed page list, and a status line. The current page and unavailable directions are text rather than focusable controls.
 - Card and pagination components, both adjustable through component level custom properties.

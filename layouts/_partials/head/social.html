@@ -1,0 +1,17 @@
+{{- /* Open Graph and X (Twitter) card tags.
+
+These call Hugo's embedded templates, which track the platforms' own changes, so
+the base does not carry its own copy. They read:
+
+  site:  title, params.description, params.images, params.social.twitter,
+         params.social.facebook_app_id, params.social.facebook_admin
+  page:  title, description, images, date, audio, videos, series, tags
+
+A site that needs different tags overrides this partial, or overrides
+layouts/_partials/opengraph.html to change the embedded template itself.
+
+Images: until the image pipeline lands, these use whatever paths a site puts in
+`images`. A correctly sized social image comes from the pipeline in a later
+release. */ -}}
+{{ partial "opengraph.html" . }}
+{{ partial "twitter_cards.html" . }}

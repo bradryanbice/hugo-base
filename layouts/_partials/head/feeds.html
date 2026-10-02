@@ -1,0 +1,10 @@
+{{- /* Feed discovery for whatever feed this page actually has.
+
+Driven by the page's own output formats rather than hard coding RSS, so a site
+that adds an Atom output format gets a link to it, and a page with no feed gets
+no link. */ -}}
+{{- range .AlternativeOutputFormats -}}
+  {{- if .MediaType.FirstSuffix.Suffix | in (slice "xml" "json") }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ $.Title }} {{ with site.Title }}| {{ . }}{{ end }}">
+  {{- end -}}
+{{- end }}

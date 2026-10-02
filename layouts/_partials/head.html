@@ -1,0 +1,14 @@
+{{- /* Composes the document head from small pieces, each replaceable on its own.
+
+A site that wants different social tags overrides head/social.html. It should
+never need to copy this file: if you find yourself wanting to, the piece you
+need is missing and that is a hugo-base issue. */ -}}
+{{ partial "head/meta.html" . }}
+{{ partial "head/canonical.html" . }}
+{{ partial "head/social.html" . }}
+{{ partial "head/feeds.html" . }}
+{{ partial "head/icons.html" . }}
+{{ partial "head/schema.html" . }}
+{{ partial "head/css.html" . }}
+{{ partial "head/css-site.html" . }}
+{{ partial "hooks/head-end.html" . }}

@@ -20,3 +20,10 @@ updated = "Updated"
 notFoundTitle = "Page not found"
 notFoundBody = "That page does not exist, or it moved."
 backToHome = "Back to the home page"
+
+# Shortcodes
+calloutNote = "Note"
+calloutTip = "Tip"
+calloutWarning = "Warning"
+calloutDanger = "Caution"
+tableNumber = "Table {{ .number }}"

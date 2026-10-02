@@ -1,0 +1,58 @@
+{{- /* An image with an optional caption.
+
+    {{< figure src="photo.jpg" alt="What the image shows" caption="A caption" >}}
+
+Parameters, matching Hugo's embedded figure where they overlap so existing
+content keeps working:
+
+  src       required. A page resource name, or a path under assets/.
+  alt       required, and may be "" for a decorative image.
+  caption   optional. Rendered as Markdown.
+  title     optional. Rendered as a heading above the image.
+  link      optional. Wraps the image in a link.
+  attr      optional. An attribution, appended to the caption.
+  attrlink  optional. Makes the attribution a link.
+  loading, fetchpriority, sizes, class, width, height
+            optional, passed through to the image partial.
+
+The image goes through the pipeline, so it gets responsive widths, a WebP
+alternative, and width and height. A missing alt fails the build. */ -}}
+
+{{- $alt := .Get "alt" -}}
+{{- if not (isset .Params "alt") -}}
+  {{- errorf "figure: no alt text for %q (page %s). Pass alt with a description, or alt=\"\" if the image is decorative." (.Get "src") .Page.Path -}}
+{{- end -}}
+
+{{- $image := partial "image.html" (dict
+  "src" (.Get "src")
+  "alt" $alt
+  "page" .Page
+  "sizes" (.Get "sizes")
+  "loading" (.Get "loading")
+  "fetchpriority" (.Get "fetchpriority")
+  "class" (.Get "class")
+  "width" (.Get "width")
+  "height" (.Get "height")
+) -}}
+
+<figure class="figure">
+  {{- with .Get "title" }}
+    <h3 class="figure__title">{{ . }}</h3>
+  {{- end }}
+  {{- with .Get "link" }}
+    <a href="{{ . }}">{{ $image }}</a>
+  {{- else }}
+    {{ $image }}
+  {{- end }}
+  {{- $caption := .Get "caption" -}}
+  {{- with .Get "attr" -}}
+    {{- $attr := . -}}
+    {{- with $.Get "attrlink" -}}
+      {{- $attr = printf "[%s](%s)" $attr . -}}
+    {{- end -}}
+    {{- $caption = trim (printf "%s %s" ($caption | default "") $attr) " " -}}
+  {{- end }}
+  {{- with $caption }}
+    <figcaption class="figure__caption">{{ . | $.Page.RenderString }}</figcaption>
+  {{- end }}
+</figure>

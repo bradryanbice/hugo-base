@@ -28,6 +28,9 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Shortcodes: `figure` (through the image pipeline, accepting Hugo's embedded figure parameters including `attr`), `callout` (note, tip, warning, danger, each stating its type as text), and `table` (a caption that also names the scroll region).
+- `_markup/render-table.html` wraps every Markdown table in a keyboard reachable scroll region with an accessible name, so a wide table is not unreachable content, and applies cell alignment as a data attribute rather than an inline style.
+- Callout and table components, adjustable through component level custom properties.
 - Image pipeline: `image.html` emits a `picture` with WebP sources and a fallback in the original format, several widths with no upscaling, `sizes`, and width and height on every raster image. A missing alt fails the build; `alt=""` is the deliberate way to mark an image decorative. SVG and GIF pass through.
 - `_markup/render-image.html` routes Markdown images through the pipeline, and turns a Markdown title into a real `figcaption` rather than a title attribute.
 - `params.base.images` contract (`widths`, `sizes`, `formats`), WebP by default with AVIF as an opt in.

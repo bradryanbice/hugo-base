@@ -1,0 +1,66 @@
+/* Callouts: a note, tip, warning or caution inside prose.
+ *
+ * The type is carried by the label text in the markup, so color is only ever
+ * reinforcement. Each type's surface, border and text come from the status
+ * tokens, which the contrast check verifies in both schemes.
+ *
+ * Foundation file. A site must not override it. */
+
+.callout {
+  padding: var(--callout-padding, var(--space-2) var(--space-3));
+  border-inline-start: var(--space-0h) solid var(--callout-border, var(--color-border-strong));
+  border-radius: var(--callout-radius, var(--radius-md));
+  background-color: var(--callout-surface, var(--color-surface-sunken));
+  color: var(--callout-text, var(--color-text));
+}
+
+.callout__label {
+  margin-block: 0 var(--space-0h);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--callout-label, var(--callout-text, var(--color-text)));
+}
+
+/* Prose rhythm inside the body, without inheriting the prose measure. */
+.callout__body > * + * {
+  margin-block-start: var(--space-2);
+}
+
+.callout__body > :first-child {
+  margin-block-start: 0;
+}
+
+.callout--note {
+  --callout-surface: var(--color-info-surface);
+  --callout-border: var(--color-info-border);
+  --callout-text: var(--color-info-text);
+}
+
+.callout--tip {
+  --callout-surface: var(--color-success-surface);
+  --callout-border: var(--color-success-border);
+  --callout-text: var(--color-success-text);
+}
+
+.callout--warning {
+  --callout-surface: var(--color-warning-surface);
+  --callout-border: var(--color-warning-border);
+  --callout-text: var(--color-warning-text);
+}
+
+.callout--danger {
+  --callout-surface: var(--color-danger-surface);
+  --callout-border: var(--color-danger-border);
+  --callout-text: var(--color-danger-text);
+}
+
+/* In forced colors mode the author's surfaces disappear, so the border is what
+ * keeps the callout distinguishable from the text around it. */
+@media (forced-colors: active) {
+  .callout {
+    border: var(--border-thin) solid;
+    border-inline-start-width: var(--space-0h);
+  }
+}

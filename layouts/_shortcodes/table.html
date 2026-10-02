@@ -1,0 +1,20 @@
+{{- /* A Markdown table with a caption.
+
+    {{< table caption="Spacing tokens" >}}
+    | Token | Value |
+    |---|---|
+    | --space-1 | 0.5rem |
+    {{< /table >}}
+
+Parameters:
+  caption   recommended. Describes the table, and names the scroll region.
+
+The inner Markdown is rendered normally, so the table render hook wraps it in a
+scrollable region. The caption is passed to that hook through a page scoped
+store, which is how a shortcode hands context to a render hook. */ -}}
+
+{{- with .Get "caption" -}}
+  {{- $.Page.Store.Set "tableCaption" . -}}
+{{- end -}}
+{{ .Inner | .Page.RenderString (dict "display" "block") }}
+{{- $.Page.Store.Delete "tableCaption" -}}

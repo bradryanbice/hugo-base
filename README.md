@@ -60,6 +60,37 @@ site copy of a foundation file. The config lives in the module, so a rule added
 here reaches a site in the same pull request that bumps hugo-base. `--self-test`
 lints a deliberately broken fixture and requires every rule to fire.
 
+## Shortcodes
+
+| Shortcode | Parameters |
+|---|---|
+| `figure` | `src`, `alt` (required), `caption`, `title`, `link`, `attr`, `attrlink`, plus `sizes`, `loading`, `fetchpriority`, `class` |
+| `callout` | `type` (`note`, `tip`, `warning`, `danger`), `title` to replace the label |
+| `table` | `caption`, which also names the scroll region |
+
+```markdown
+{{< callout type="warning" >}}
+Body text, rendered as **Markdown**.
+{{< /callout >}}
+
+{{< table caption="Spacing tokens" >}}
+| Token | Value |
+|---|---|
+| `--space-1` | 0.5rem |
+{{< /table >}}
+```
+
+`figure` accepts the parameters of Hugo's embedded figure, so content written
+before adopting hugo-base keeps working. One difference: images must be page
+resources or under `assets/`, because the pipeline cannot process a path in
+`static/`.
+
+Every Markdown table, with or without the shortcode, is wrapped in a focusable
+region with an accessible name, so a table too wide for the screen can still be
+scrolled by keyboard.
+
+A callout always states its type as text, so the meaning never depends on color.
+
 ## Images
 
 A Markdown image goes through the pipeline:

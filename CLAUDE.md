@@ -41,6 +41,19 @@ Out of scope, always: domain names, brand color values, navigation content,
 analytics IDs, any data schema, any content-type-specific layout, chart
 components (explicitly deferred).
 
+## Where things are written down
+
+| Audience | File |
+|---|---|
+| maintaining the base | this file |
+| every consuming site | `agents/rules/`, synced into each site |
+| someone adopting or using the base | `README.md` |
+| why a non-obvious choice was made | `docs/decisions/` |
+| what changed, and what a site must do | `CHANGELOG.md` and `migrations/` |
+
+Keep each fact in one of those, not several. When a convention changes, the
+rule file is the source of truth and the others point at it.
+
 ## Repository layout
 
 | Path | What it holds |
@@ -54,6 +67,8 @@ components (explicitly deferred).
 | `tools/ci/`, `tools/quality/` | the gate, run from the version a site pins |
 | `renovate/hugo.json` | shared Renovate preset |
 | `exampleSite/` | the test harness, and the first consumer of the sync |
+| `migrations/` | one note per release that needs work in a site |
+| `docs/decisions/` | decision records |
 
 ## How a change reaches the sites
 

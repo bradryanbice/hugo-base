@@ -2,11 +2,16 @@
 
 All notable changes to hugo-base are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
-[semantic versioning](https://semver.org/). While the version is 0.x, a minor
-release may contain breaking changes, listed under a Breaking heading.
+[semantic versioning](https://semver.org/).
 
-Releases that need work in a consuming site link their migration note. Apply
-one with the `hugo-base-upgrade` skill, or read `migrations/vX.Y.Z.md`.
+While the version is 0.x a minor release may break a consumer. Anything that
+does is listed first, under **Breaking**, and says what a site has to change.
+A release that needs work in a site links its note in `migrations/`.
+
+The public API is the seam list in the README: layouts, hooks, seam partials,
+replaceable partials, shortcodes, render hooks, i18n keys and the theme inputs.
+Renaming or removing one of those is a breaking change. Everything else is
+internal.
 
 ## Unreleased
 

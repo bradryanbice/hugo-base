@@ -48,6 +48,17 @@ function formatViolation(violation) {
   for (const node of violation.nodes.slice(0, 5)) {
     lines.push(`    at ${node.target.join(" ")}`);
     lines.push(`      ${node.html.replace(/\s+/g, " ").slice(0, 160)}`);
+    // axe measures the colors it compared. Printing them turns "contrast
+    // failed somewhere" into a diagnosis, which matters most when a failure
+    // only reproduces on another machine.
+    for (const check of node.any ?? []) {
+      const data = check.data ?? {};
+      if (data.contrastRatio !== undefined) {
+        lines.push(
+          `      measured ${data.fgColor} on ${data.bgColor} = ${data.contrastRatio}:1, needs ${data.expectedContrastRatio}`,
+        );
+      }
+    }
   }
   if (violation.nodes.length > 5) {
     lines.push(`    and ${violation.nodes.length - 5} more`);
@@ -82,6 +93,9 @@ const axeModule = await import("@axe-core/playwright");
 const AxeBuilder = axeModule.default ?? axeModule.AxeBuilder;
 
 const browser = await launch();
+// Which browser ran matters: a contrast failure that appears only in CI is
+// usually a browser difference, and this is the first thing to compare.
+console.log(`browser: ${browser.version()}`);
 const results = [];
 let violationCount = 0;
 

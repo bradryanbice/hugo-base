@@ -25,7 +25,10 @@ For a site that already exists, follow
 [`migrations/v0.1.0.md`](migrations/v0.1.0.md) instead: it covers the parts that
 fail quietly, like old layout paths that shadow the base.
 
-For a new site:
+For a new site, start from
+[hugo-starter](https://github.com/bradryanbice/hugo-starter): use that
+template, change four values and set a hue. The rest of this section is what
+the template already does, for anyone assembling a site by hand.
 
 ```sh
 hugo mod init github.com/<owner>/<repo>

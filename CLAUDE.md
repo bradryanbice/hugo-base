@@ -22,9 +22,12 @@ versioned with git tags and semver (`vMAJOR.MINOR.PATCH`). While the version is
 `0.x`, a MINOR bump may break consumers and must say so in `CHANGELOG.md`.
 
 Consumers today: bradbice.com, royalrumblestats.com, playoffsbracket.com,
-headedapp.com, calaround.app, plus an upcoming political statistics site. The
-companion repo `hugo-starter` is a thin GitHub template for new sites. It is
-not this repo.
+headedapp.com, calaround.app, plus an upcoming political statistics site.
+
+`bradryanbice/hugo-starter` is the companion template for new sites: config,
+brand inputs and nothing else. It takes its CI workflow and rules from this
+module through the sync, so it cannot drift. When something a new site needs is
+missing, the fix usually belongs here rather than in the template.
 
 ## The scope test
 

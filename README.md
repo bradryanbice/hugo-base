@@ -1,229 +1,70 @@
 # hugo-base
 
-A shared Hugo Module holding the layouts, CSS foundation, partials and
-conventions used by every site in this family. Sites import it, override
-individual files by placing their own copy at the same path, and update it
-with a version bump.
+A shared Hugo Module holding the layouts, CSS foundation, partials, tooling and
+conventions behind several sites. A site imports it, supplies a brand and its
+content, and gets accessible markup, a design token system, responsive images,
+SEO and a CI gate that checks all of it.
 
-Status: pre-release, working toward v0.1.0. Not ready for use yet.
+Status: working toward v0.1.0. Usable from a tag once that is released.
 
-## Requirements
+## What belongs here, and what does not
 
-- Hugo 0.166.0 or later (extended edition, pinned in `mise.toml`)
-- Go 1.27 or later (Hugo Modules use it to fetch modules)
-- [mise](https://mise.jdx.dev/) to install the pinned toolchain
+The test is simple: **would this be true for every site?** If it would only be
+true for one, it belongs in that site.
 
-## Developing
+In the base: design tokens and the CSS foundation, base layouts, the head and
+structured data, the page shell, pagination, the image pipeline, the shared
+shortcodes, archetypes, the shared rules, the CI gate, and the Renovate preset.
 
-```sh
-mise install
-hugo server --source exampleSite
-hugo build --source exampleSite --gc --minify --panicOnWarning
-```
+Never in the base: domain names, brand colors, navigation content, analytics
+IDs, data schemas, and layouts for one site's content types.
 
-`exampleSite/` is the test harness. It imports this module from the local
-checkout, so changes show up immediately.
+## Quick start
 
-## Shared rules and managed files
+For a site that already exists, follow
+[`migrations/v0.1.0.md`](migrations/v0.1.0.md) instead: it covers the parts that
+fail quietly, like old layout paths that shadow the base.
 
-hugo-base is the single source of truth for how its sites are built, not just
-for their code. `agents/rules/` holds the conventions (accessibility, CSS and
-tokens, templates, content, maintenance). `tools/managed-files.toml` lists what
-hugo-base owns inside a site:
-
-| In the site | Comes from |
-|---|---|
-| `.claude/rules/hugo-base/*.md` | `agents/rules/` |
-| `.claude/skills/*` | `agents/skills/` |
-| `.github/workflows/ci.yml` | `tools/templates/site-ci.yml`, with the version this site pins |
-| `.github/pull_request_template.md`, `.editorconfig`, `hugo-base.sh` | `tools/templates/` |
-
-A site refreshes them with `./hugo-base.sh sync`, and CI fails when they are
-stale. So a Renovate bump of hugo-base carries that version's updated rules
-into the same pull request, where the diff shows exactly what changed. The
-copies are pinned to the version in the site's `go.mod`, so the instructions a
-site follows always describe the code it actually has.
-
-A site's own guidance goes in `.claude/rules/site/*.md`, which the sync tool
-never touches. `CLAUDE.md`, `.claude/settings.json`, config, `mise.toml` and
-`netlify.toml` stay site owned.
-
-## CSS policy lint
+For a new site:
 
 ```sh
-bash tools/lint/run.sh --self-test . exampleSite
+hugo mod init github.com/<owner>/<repo>
+hugo mod get github.com/bradryanbice/hugo-base@v0.1.0
 ```
-
-Enforces the CSS rules rather than trusting them: OKLCH only, spacing and color
-from tokens, no `!important`, no removed focus rings, logical properties, and no
-site copy of a foundation file. The config lives in the module, so a rule added
-here reaches a site in the same pull request that bumps hugo-base. `--self-test`
-lints a deliberately broken fixture and requires every rule to fire.
-
-## Shortcodes
-
-| Shortcode | Parameters |
-|---|---|
-| `figure` | `src`, `alt` (required), `caption`, `title`, `link`, `attr`, `attrlink`, plus `sizes`, `loading`, `fetchpriority`, `class` |
-| `callout` | `type` (`note`, `tip`, `warning`, `danger`), `title` to replace the label |
-| `table` | `caption`, which also names the scroll region |
-
-```markdown
-{{< callout type="warning" >}}
-Body text, rendered as **Markdown**.
-{{< /callout >}}
-
-{{< table caption="Spacing tokens" >}}
-| Token | Value |
-|---|---|
-| `--space-1` | 0.5rem |
-{{< /table >}}
-```
-
-`figure` accepts the parameters of Hugo's embedded figure, so content written
-before adopting hugo-base keeps working. One difference: images must be page
-resources or under `assets/`, because the pipeline cannot process a path in
-`static/`.
-
-Every Markdown table, with or without the shortcode, is wrapped in a focusable
-region with an accessible name, so a table too wide for the screen can still be
-scrolled by keyboard.
-
-A callout always states its type as text, so the meaning never depends on color.
-
-## Images
-
-A Markdown image goes through the pipeline:
-
-```markdown
-![What the image shows](photo.jpg)
-![What the image shows](photo.jpg "A caption, which may contain Markdown.")
-```
-
-It generates WebP alternatives and several widths, never upscales, and always
-sets width and height so the page does not shift while loading. A title becomes
-a `figcaption`. Call `partial "image.html"` directly for finer control
-(`loading`, `fetchpriority`, `class`).
-
-Omitting alt text **fails the build**, naming the image and the page.
-`alt=""` is how you mark an image decorative, deliberately.
-
-Tune with `params.base.images`: `widths`, `sizes`, and `formats` (WebP only by
-default; add `"avif"` to opt in, at a build time cost on every width).
-
-Keep the image cache between deploys. `netlify.toml` sets `HUGO_CACHEDIR` to a
-path Netlify persists, which matters once a site has many images.
-
-## Config contract
-
-Most Hugo configuration categories do not merge from a module into a site, so
-the base cannot simply set them. Tested on Hugo 0.166.0:
-
-- A **project level** `_merge = "deep"`, either at the root or on a category,
-  does pull that category's values from an imported module.
-- `_merge` declared **inside the module** has no effect. Only the project's own
-  config counts, which is why each site carries the opt in.
-
-What that means in practice:
-
-| Category | Reaches a site | A site should |
-|---|---|---|
-| `params`, `menus`, `mediaTypes`, `outputFormats` | automatically | nothing |
-| `markup`, `imaging`, `services` | only with an opt in | add `_merge = "deep"` to inherit the base's defaults |
-| `outputs`, `sitemap`, `taxonomies`, `pagination` | only with an opt in | set its own: the base contributes nothing here, because Hugo's defaults already match |
-| root keys (`baseURL`, `title`, `locale`, `enableRobotsTXT`, `disableHugoGeneratorInject`) | never | always set them itself |
-
-So a consuming site's config needs these three files, each one line:
 
 ```toml
-# config/_default/markup.toml
-_merge = "deep"
-# config/_default/imaging.toml
-_merge = "deep"
-# config/_default/services.toml
-_merge = "deep"
+# config/_default/module.toml
+[[imports]]
+  path = "github.com/bradryanbice/hugo-base"
 ```
-
-The opt in is enumerated per category rather than a single root `_merge`, so a
-later base release cannot start contributing to a category (`security`,
-`build`, `privacy`) without that showing up as a deliberate change.
-
-What the base contributes, and why each default is worth changing:
-
-- **markup**: class based syntax highlighting (Chroma's inline hex ignores the
-  tokens and fails contrast), GitHub style heading anchors, a table of contents
-  from h2 to h3, raw HTML left escaped, and typographer dash substitutions
-  mapped to themselves so `--` and `---` stay as the author typed them.
-- **imaging**: CatmullRom resampling (sharper downscaling than Hugo's default
-  box) and per format quality.
-- **services**: a feed limit of 50, where Hugo's default is unlimited.
-
-## Feeds, sitemap and robots
-
-- RSS and the sitemap use Hugo's embedded templates. The feed carries full page
-  content and is limited to 50 items.
-- A page with `noindex: true` in front matter should also set
-  `sitemap.disable: true`. The gate fails when it does not.
-- `layouts/robots.txt` allows everything on a production build and disallows
-  everything otherwise, so Netlify deploy previews cannot be indexed. It needs
-  `enableRobotsTXT = true` in the site config, because root keys cannot come
-  from a module.
-
-## Quality gate
-
-```sh
-bash tools/quality/run.sh exampleSite/public
-```
-
-This checks the head contract on every page (one title, one canonical, a
-description, one `h1`, parseable JSON-LD), serves the built site, runs axe over
-every URL in its sitemap (WCAG 2.0,
-2.1 and 2.2 A and AA) in both light and dark mode, checks every semantic color
-pair in the token contract for contrast, runs Lighthouse CI against the
-assertions in `tools/quality/lighthouserc.json`, and then self tests by
-requiring axe to fail on a deliberately broken page. Chrome comes from the machine, so no
-browser is downloaded. Consuming sites get the same gate through the reusable
-workflow, which is where a site's own brand colors get checked for contrast.
-
-## Theming a site
-
-A site declares only the inputs it wants in `assets/css/tokens/theme.css`:
-
-```css
-:root {
-  --accent-hue: 25;
-  --accent-chroma: 0.15;
-  --neutral-chroma: 0.006;
-  --radius-scale: 0;
-}
-```
-
-Ramps, hover and active states, dark mode and elevation are all derived from
-those. Inputs left out keep their defaults, so a theme file cannot break a
-token by omission. The base's own `tokens/theme.css` documents every input, and
-`exampleSite` ships a theme that overrides it.
-
-Fonts are inputs too: `--font-body`, `--font-heading` and `--font-mono`.
-
-Everything else in `assets/css/` is foundation: a site must not copy it, and CI
-fails if it does.
-
-One piece of config is required for syntax highlighting, because Hugo otherwise
-writes hardcoded hex colors that ignore the tokens and fail contrast:
 
 ```toml
-[markup.highlight]
-  noClasses = false
+# config/_default/markup.toml, imaging.toml, services.toml
+# One line each, so the site inherits the base's defaults for these.
+_merge = "deep"
 ```
 
-## Renovate
+```toml
+# config/_default/hugo.toml
+baseURL = "https://example.com/"
+title = "Example"
+locale = "en-US"
+enableRobotsTXT = true
+disableHugoGeneratorInject = true
+```
 
-`renovate/hugo.json` is a shared preset. It keeps the Hugo and Go versions in
-`mise.toml`, `netlify.toml` and any workflow `HUGO_VERSION` or `GO_VERSION`
-identical, and opens one grouped PR per release. It also groups a site's
-hugo-base module bump with its reusable CI workflow ref.
+Then take the shared CI workflow, rules and tooling:
 
-A site uses it by adding this to its `renovate.json`:
+```sh
+# First time, from the module (the stub is itself one of these files):
+hugo config mounts | grep -B2 hugo-base | grep '"dir"'
+python3 <module dir>/tools/sync.py --base <module dir> --site .
+
+# From then on:
+./hugo-base.sh sync
+```
+
+And point Renovate at the shared preset:
 
 ```json
 {
@@ -231,12 +72,212 @@ A site uses it by adding this to its `renovate.json`:
 }
 ```
 
-Extending by reference (recommended) means fixes to the preset reach every
-site immediately. Copying `renovate/hugo.json` into a site also works, because
-it contains nothing specific to this repo, but copies drift.
+Never run `go mod tidy` in a Hugo site. There is no Go code, so it would drop
+the hugo-base requirement. Use `hugo mod tidy`.
 
-Never enable Renovate's `gomodTidy` option in a hugo-base site. There is no Go
-code, so `go mod tidy` would remove the hugo-base requirement.
+## Theming
 
-Consumer documentation (importing, overriding, theming, updating) arrives
-before v0.1.0.
+One file, holding inputs only:
+
+```css
+/* assets/css/tokens/theme.css */
+:root {
+  --accent-hue: 25;        /* OKLCH hue, 0 to 360 */
+  --accent-chroma: 0.15;   /* 0 is grey, 0.12 to 0.2 is saturated */
+  --neutral-chroma: 0.006; /* tints greys toward the brand */
+  --font-heading: "Your Font", system-ui, sans-serif;
+  --radius-scale: 1;       /* 0 square, 1 default, 2 softer */
+}
+```
+
+Ramps, hover and active states, dark mode and elevation are all derived from
+those. Every input is read with its default as a fallback, so setting one value
+cannot break another, and the file is loaded last in the tokens layer so a site
+can also override a single computed step (`--accent-700`) when a hue clips.
+
+The inputs: `--accent-hue`, `--accent-chroma`, `--neutral-hue`,
+`--neutral-chroma`, `--status-chroma`, `--info-hue`, `--success-hue`,
+`--warning-hue`, `--danger-hue`, `--font-body`, `--font-heading`, `--font-mono`,
+`--radius-scale`, `--shadow-strength`. The base's own
+`assets/css/tokens/theme.css` documents each with its default.
+
+**Contrast becomes the site's responsibility** once it sets a brand color. The
+gate checks every semantic pair in both light and dark mode against the built
+site, so a brand that fails contrast fails CI rather than shipping.
+
+## The public API
+
+These names are stable. Anything not listed is internal and may change in a
+minor release while the version is `0.x`.
+
+**Layouts.** Hugo prefers a page kind template over a standard one, so a site
+adds `home.html`, `section.html`, `taxonomy.html` or `term.html` to replace the
+base's `list.html` for that kind, and `layouts/<section>/single.html` for a
+content type. The base ships `baseof.html`, `single.html`, `list.html` and
+`404.html`.
+
+**Hooks**, which render nothing by default:
+
+| Hook | Where |
+|---|---|
+| `_partials/hooks/head-end.html` | end of `<head>` |
+| `_partials/hooks/body-start.html` | start of `<body>`, before the skip link |
+| `_partials/hooks/header-end.html` | after the navigation |
+| `_partials/hooks/footer-start.html` | start of the footer |
+| `_partials/hooks/body-end.html` | end of `<body>`, for deferred scripts |
+
+**Seams**, meant to be replaced:
+
+| Partial | Purpose |
+|---|---|
+| `_partials/site/logo.html` | a mark inside the brand link |
+| `_partials/head/icons.html` | favicons and manifest |
+| `_partials/head/css-site.html` | a site's own stylesheet |
+| `_partials/page/search.html` | a search form on the 404 page |
+
+**Replaceable pieces**: `head/meta.html`, `head/canonical.html`,
+`head/social.html`, `head/feeds.html`, `head/schema.html`, `site/header.html`,
+`site/footer.html`, `site/nav.html`, `site/menu-items.html`,
+`site/skip-link.html`, `pagination.html`, `page/meta.html`, `page/card.html`,
+`page/terms.html`, `image.html`.
+
+Replace one of those rather than copying `head.html` or `baseof.html`. If you
+need to copy a composing file to change one line, the piece you need is
+missing, and that is an issue here.
+
+**Shortcodes**: `figure`, `callout`, `table`. **Render hooks**: images and
+tables. **i18n keys**: every user visible string, in `i18n/en.toml`.
+
+Foundation CSS is **not** replaceable: `main.css`, `tokens/scale.css`,
+`tokens/color.css`, `tokens/semantic.css`, `foundation/**` and
+`layout/primitives.css` must not be copied into a site, and the lint fails if
+they are. Theme through `tokens/theme.css` and through component level custom
+properties (`--card-radius`, `--callout-padding`).
+
+## Params
+
+Everything the base reads lives under `params.base`, so it cannot collide with
+a site's own params.
+
+| Param | Default | Purpose |
+|---|---|---|
+| `base.titleSeparator` | a pipe | between page title and site title |
+| `base.themeColor` | unset | `theme-color` meta |
+| `base.dateFormat` | `:date_long` | date display, via `time.Format` |
+| `base.images.widths` | 320 to 1600 | widths to generate |
+| `base.images.sizes` | `100vw` | the `sizes` attribute |
+| `base.images.formats` | `["webp"]` | add `"avif"` to opt in |
+| `base.schema.type` | unset | `Organization` or `Person` |
+| `base.schema.name` | unset | publisher name |
+| `base.schema.logo` | unset | publisher logo |
+| `base.schema.author` | unset | default author |
+
+Hugo's own social tags read `params.description`, `params.images` and
+`params.social.twitter`.
+
+## Config contract
+
+Most Hugo configuration categories do not merge from a module into a site.
+Tested on Hugo 0.166.0: a **project level** `_merge = "deep"` does pull a
+category from an imported module, and `_merge` inside the module has no effect.
+
+| Category | Reaches a site | A site should |
+|---|---|---|
+| `params`, `menus`, `mediaTypes`, `outputFormats` | automatically | nothing |
+| `markup`, `imaging`, `services` | with an opt in | add `_merge = "deep"` |
+| `outputs`, `sitemap`, `taxonomies`, `pagination` | with an opt in | set its own; the base contributes nothing |
+| root keys (`baseURL`, `title`, `locale`, `copyright`, `enableRobotsTXT`, `disableHugoGeneratorInject`) | never | always set them |
+
+What the base contributes, each because Hugo's default is wrong for us:
+
+- **markup**: class based syntax highlighting (Chroma's inline hex ignores the
+  tokens and fails contrast), GitHub style heading anchors, a table of contents
+  from h2 to h3, raw HTML left escaped, and typographer dash substitutions
+  mapped to themselves so `--` and `---` stay as typed. Task lists are off:
+  Hugo renders them as a checkbox with no accessible name.
+- **imaging**: CatmullRom resampling and per format quality.
+- **services**: a feed limit of 50, where Hugo's default is unlimited.
+
+## Content
+
+```markdown
+![What the image shows](photo.jpg)
+![What the image shows](photo.jpg "A caption, which may contain Markdown.")
+
+{{< callout type="warning" >}}
+Body text, rendered as **Markdown**.
+{{< /callout >}}
+
+{{< figure src="photo.jpg" alt="What it shows" caption="A caption" >}}
+```
+
+- **Images** live in the page bundle or `assets/`, never `static/`: the pipeline
+  cannot process a `static/` path, and the build says so. They get WebP
+  alternatives, several widths, and width and height so pages do not shift.
+- **Alt text is required.** The build fails and names the page. `alt=""` marks
+  an image decorative, deliberately.
+- **Every table** is wrapped in a focusable, named scroll region, so a table too
+  wide for the screen can still be read by keyboard.
+- **A callout always states its type as text**, so meaning never rests on color.
+- Pair `noindex: true` with `sitemap.disable: true`. The gate enforces it.
+- `figure` accepts Hugo's embedded figure parameters, so older content works.
+
+## Updating
+
+```sh
+hugo mod get -u github.com/bradryanbice/hugo-base
+hugo mod tidy
+./hugo-base.sh sync
+```
+
+Read [`CHANGELOG.md`](CHANGELOG.md) for the versions you cross. A release that
+needs work in a site links a note in [`migrations/`](migrations/). Apply it with
+the `hugo-base-upgrade` skill, which the sync puts in the site, or follow the
+note by hand.
+
+Renovate opens one grouped pull request per Hugo release covering `mise.toml`,
+`netlify.toml` and any workflow, and a separate one for hugo-base itself
+grouped with the CI workflow reference. CI on that pull request fails until the
+managed files are synced, which is how a new convention arrives.
+
+While the version is `0.x`, a minor release may break a consumer, and the
+CHANGELOG says so under a Breaking heading.
+
+## Working on the base itself
+
+```sh
+mise install
+hugo server --source exampleSite
+```
+
+`exampleSite/` is the harness, and it is also the first consumer: it imports
+the module from the local checkout, so changes appear immediately. Point a real
+site at a local checkout the same way:
+
+```toml
+[module]
+replacements = "github.com/bradryanbice/hugo-base -> ../hugo-base"
+```
+
+The checks, all runnable locally and all run by CI:
+
+```sh
+bash tools/ci/check-versions.sh                # toolchain pins agree
+bash tools/ci/lint-dashes.sh                   # no en or em dashes
+bash tools/ci/build.sh exampleSite             # strict build: fails on warnings,
+                                               # deprecations and unused templates
+bash tools/ci/check-harness.sh exampleSite/public
+python3 tools/sync.py --base . --site exampleSite --check
+bash tools/lint/run.sh --self-test . exampleSite   # CSS policy, protected paths
+bash tools/quality/run.sh exampleSite/public       # head, axe, contrast, Lighthouse
+```
+
+The gate checks the head contract on every page, runs axe over every sitemap
+URL in both color schemes, checks all 33 semantic color pairs for contrast and
+for tokens that fail to resolve, runs Lighthouse on a chosen set of pages
+including every page with an image, and then **proves itself** by requiring axe
+to fail on a deliberately broken fixture.
+
+Decisions behind all of this are in [`docs/decisions/`](docs/decisions/). The
+conventions that travel to every site are in [`agents/rules/`](agents/rules/),
+and this repo follows them through `.claude/rules/shared`.

@@ -17,6 +17,9 @@ concurrency:
 
 permissions:
   contents: read
+  # So the gate can post a notice listing the migrations a hugo-base bump
+  # crosses. Without it the notice is logged and nothing else changes.
+  pull-requests: write
 
 jobs:
   site:

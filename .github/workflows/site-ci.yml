@@ -116,6 +116,33 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+      - name: Migration notice
+        # Informational, never a gate: the build, lint and sync checks fail on
+        # their own when a migration has not been applied. Needs
+        # pull-requests: write in the caller to post, and is skipped quietly
+        # when the token cannot (a fork, or a caller that did not grant it).
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_DIR: ${{ steps.base.outputs.dir }}
+        run: |
+          git fetch --quiet --depth=1 origin "$GITHUB_BASE_REF"
+          module="github.com/bradryanbice/hugo-base"
+          current=$(grep -oE "$module v[0-9.]+" go.mod 2>/dev/null | awk '{print $2}' | head -1)
+          previous=$(git show "origin/$GITHUB_BASE_REF:go.mod" 2>/dev/null | grep -oE "$module v[0-9.]+" | awk '{print $2}' | head -1)
+          if [ -z "$current" ] || [ -z "$previous" ] || [ "$current" = "$previous" ]; then
+            echo "hugo-base version unchanged in this pull request."
+            exit 0
+          fi
+          echo "hugo-base $previous -> $current"
+          notice=$(python3 "$BASE_DIR/tools/ci/migration-notice.py" "$BASE_DIR" "$previous" "$current")
+          if [ -n "$notice" ]; then
+            printf '%s\n' "$notice"
+            printf '%s\n' "$notice" | gh pr comment "${{ github.event.pull_request.number }}" --body-file - \
+              || echo "could not post the notice (the caller may not grant pull-requests: write)"
+          fi
+
       - name: Harness coverage
         if: inputs.harness-check
         run: bash "${{ steps.base.outputs.dir }}/tools/ci/check-harness.sh" "$SOURCE/public"

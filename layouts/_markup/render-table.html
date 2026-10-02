@@ -1,0 +1,58 @@
+{{- /* Every Markdown table, wrapped so it can be scrolled by keyboard.
+
+A table that is wider than its container has to scroll sideways. A plain
+overflow container cannot be reached by keyboard, so a keyboard user simply
+cannot see the rest of the table (axe reports this as
+scrollable-region-focusable).
+
+The fix is the established pattern: a focusable region with an accessible name.
+It is applied to every table rather than only to wide ones, because neither
+Hugo nor CSS knows the rendered width, and an unnecessary tab stop is a much
+smaller problem than unreachable content.
+
+The name comes from the caption set by the table shortcode, when there is one,
+and otherwise from a numbered fallback, because a region with no name is worse
+than a generic one.
+
+Cell alignment comes from the Markdown, applied as a data attribute rather than
+an inline style, so the CSS policy lint stays meaningful and a site can restyle
+alignment. */ -}}
+
+{{- $caption := .Page.Store.Get "tableCaption" -}}
+
+{{- /* .Ordinal restarts at zero inside each shortcode's own RenderString call,
+     so two captioned tables on one page would share an id and produce invalid
+     markup plus a duplicate-id-aria violation. A page scoped counter numbers
+     them across the whole page instead. */ -}}
+{{- $number := add 1 (.Page.Store.Get "tableCount" | default 0) -}}
+{{- .Page.Store.Set "tableCount" $number -}}
+{{- $id := printf "table-%d" $number -}}
+
+<div class="table-wrap" role="region" tabindex="0"
+  {{- if $caption }} aria-labelledby="{{ $id }}-caption"
+  {{- else }} aria-label="{{ i18n "tableNumber" (dict "number" $number) }}"
+  {{- end }}>
+  <table>
+    {{- with $caption }}
+      <caption id="{{ $id }}-caption">{{ . | $.Page.RenderString }}</caption>
+    {{- end }}
+    <thead>
+      {{- range .THead }}
+        <tr>
+          {{- range . }}
+            <th scope="col"{{ with .Alignment }} data-align="{{ . }}"{{ end }}>{{ .Text }}</th>
+          {{- end }}
+        </tr>
+      {{- end }}
+    </thead>
+    <tbody>
+      {{- range .TBody }}
+        <tr>
+          {{- range . }}
+            <td{{ with .Alignment }} data-align="{{ . }}"{{ end }}>{{ .Text }}</td>
+          {{- end }}
+        </tr>
+      {{- end }}
+    </tbody>
+  </table>
+</div>

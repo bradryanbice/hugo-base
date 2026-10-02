@@ -1,0 +1,35 @@
+{{- /* An aside for a note, tip, warning or caution.
+
+    {{< callout type="warning" >}}
+    Body text, rendered as **Markdown**.
+    {{< /callout >}}
+
+    {{< callout type="note" title="Before you start" >}} ... {{< /callout >}}
+
+Parameters:
+  type    note (default), tip, warning or danger.
+  title   optional. Replaces the default label for that type.
+
+Accessibility notes:
+
+The type is always announced and shown as text, never by color or an icon
+alone (SC 1.4.1), so the label is part of the markup rather than a CSS
+pseudo element.
+
+role="note" rather than <aside>: an <aside> outside an article becomes a
+complementary landmark, and a page with several callouts would then clutter
+landmark navigation. role="note" conveys the same meaning without that. */ -}}
+
+{{- $types := slice "note" "tip" "warning" "danger" -}}
+{{- $type := .Get "type" | default "note" -}}
+{{- if not (in $types $type) -}}
+  {{- errorf "callout: unknown type %q (page %s). Use one of: %s." $type .Page.Path (delimit $types ", ") -}}
+{{- end -}}
+{{- $label := .Get "title" | default (i18n (printf "callout%s" (title $type))) -}}
+
+<div class="callout callout--{{ $type }}" role="note">
+  <p class="callout__label">{{ $label }}</p>
+  <div class="callout__body">
+    {{ .Inner | .Page.RenderString (dict "display" "block") }}
+  </div>
+</div>

@@ -1,0 +1,56 @@
+/* Tables and figures.
+ *
+ * The scroll region is focusable in the markup, so it needs a visible focus
+ * ring like any other focusable thing: the global :focus-visible rule covers
+ * it, which is why it must not be excluded there.
+ *
+ * Foundation file. A site must not override it. */
+
+.table-wrap {
+  overflow-x: auto;
+  /* Hint that the region can be scrolled, for pointer users. */
+  overscroll-behavior-x: contain;
+  max-inline-size: 100%;
+}
+
+.table-wrap table {
+  /* Columns size to their content, then the region scrolls, rather than text
+   * being squeezed into unreadable columns. */
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+
+caption {
+  text-align: start;
+}
+
+[data-align="center"] {
+  text-align: center;
+}
+
+[data-align="right"] {
+  text-align: end;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--table-stripe, var(--color-surface-raised));
+}
+
+.figure {
+  margin-block: var(--space-4);
+}
+
+.figure__title {
+  margin-block-end: var(--space-1);
+  font-size: var(--text-md);
+}
+
+.figure img {
+  border-radius: var(--figure-radius, var(--radius-md));
+}
+
+.figure__caption {
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

@@ -35,11 +35,18 @@ the right space and the page does not shift as images load. */ -}}
 {{- $src := .src -}}
 {{- $page := .page | default page -}}
 
+{{- /* errorf makes the build fail, but it does not stop this template, so each
+     problem sets $failed and the body below is skipped. Without that, a missing
+     image produces a second error about a method call on an empty string, and
+     the real message scrolls away. */ -}}
+{{- $failed := false -}}
 {{- if not (isset . "src") -}}
   {{- errorf "image.html: called without src (page %s)" $page.Path -}}
+  {{- $failed = true -}}
 {{- end -}}
 {{- if not (isset . "alt") -}}
   {{- errorf "image.html: %q has no alt text (page %s). Pass alt with a description, or alt=\"\" if the image is decorative." $src $page.Path -}}
+  {{- $failed = true -}}
 {{- end -}}
 
 {{- $widths := .widths | default $params.widths | default (slice 320 640 960 1280 1600) -}}
@@ -58,11 +65,13 @@ the right space and the page does not shift as images load. */ -}}
     {{- $resource = . -}}
   {{- end -}}
 {{- end -}}
-{{- if not $resource -}}
+{{- if and (not $failed) (not $resource) -}}
   {{- errorf "image.html: cannot find %q (page %s). Put it in the page bundle or under assets/, not in static/." $src $page.Path -}}
+  {{- $failed = true -}}
 {{- end -}}
 
-{{- if not (reflect.IsImageResourceProcessable $resource) -}}
+{{- if $failed -}}
+{{- else if not (reflect.IsImageResourceProcessable $resource) -}}
   {{- /* Dimensions, so even a pass through image reserves its space. Caller
        first, then the SVG's own width and height, then its viewBox. */ -}}
   {{- $w := .width -}}

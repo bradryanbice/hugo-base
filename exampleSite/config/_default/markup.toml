@@ -1,9 +1,7 @@
-# Chroma writes hardcoded hex colors inline unless it emits classes instead.
-# The base styles the classes from its own tokens, so both color schemes work
-# and contrast is verified. markup config does not merge from a module, so each
-# site carries this.
+# The base contributes markup defaults (class based highlighting, heading
+# anchors, and typographer settings that leave "--" alone). This opts in: module
+# config does not merge into a site otherwise.
+#
+# Nothing else belongs here. Add a key only to differ from the base.
 
-[highlight]
-  noClasses = false
-  lineNumbersInTable = true
-  tabWidth = 2
+_merge = "deep"

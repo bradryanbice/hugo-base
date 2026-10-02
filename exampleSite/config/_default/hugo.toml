@@ -10,3 +10,6 @@ copyright = "Example site for hugo-base. MIT licensed."
 # is set, which would put it ahead of <meta charset>. The base emits the
 # generator itself, right after charset and viewport.
 disableHugoGeneratorInject = true
+
+# Root level keys cannot come from a module, so every site sets these itself.
+enableRobotsTXT = true

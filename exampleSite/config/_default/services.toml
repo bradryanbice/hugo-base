@@ -1,0 +1,2 @@
+# Inherit the base's feed settings (a bounded item limit).
+_merge = "deep"

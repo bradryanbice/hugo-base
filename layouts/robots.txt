@@ -1,0 +1,19 @@
+{{- /* robots.txt, driven by the build environment.
+
+A deploy preview and a production build serve the same HTML, so without this a
+preview URL can be crawled and indexed, and then competes with the real site.
+Anything that is not a production build disallows everything.
+
+Needs enableRobotsTXT = true in the site config: that is a root level key, which
+cannot be contributed by a module. */ -}}
+{{ if eq hugo.Environment "production" -}}
+User-agent: *
+Allow: /
+
+Sitemap: {{ "sitemap.xml" | absURL }}
+{{ else -}}
+# Build environment: {{ hugo.Environment }}.
+# Not production, so this build is kept out of search results entirely.
+User-agent: *
+Disallow: /
+{{ end -}}

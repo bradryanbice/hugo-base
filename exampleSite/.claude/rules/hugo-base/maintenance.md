@@ -38,6 +38,28 @@ never touches. A rule you want to change for every site is a hugo-base change.
 ./hugo-base.sh sync --check   # what CI runs: fails if anything is stale
 ```
 
+## Configuration
+
+Hugo does not merge most config categories from a module into a site, so the
+base's defaults only apply where the site opts in. These three files, each
+containing one line, are part of a hugo-base site:
+
+```toml
+# config/_default/markup.toml, imaging.toml, services.toml
+_merge = "deep"
+```
+
+Add a key to one of them only to differ from the base. Anything else belongs
+upstream.
+
+Root keys never merge: `baseURL`, `title`, `locale`, `copyright`,
+`enableRobotsTXT` and `disableHugoGeneratorInject` are always the site's own.
+`outputs`, `sitemap`, `taxonomies` and `pagination` are the site's too, because
+the base contributes nothing there.
+
+Pair `noindex: true` in front matter with `sitemap.disable: true`. The gate
+fails when a noindex page is still listed in the sitemap.
+
 ## Updating hugo-base
 
 ```sh

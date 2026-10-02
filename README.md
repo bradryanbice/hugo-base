@@ -60,6 +60,61 @@ site copy of a foundation file. The config lives in the module, so a rule added
 here reaches a site in the same pull request that bumps hugo-base. `--self-test`
 lints a deliberately broken fixture and requires every rule to fire.
 
+## Config contract
+
+Most Hugo configuration categories do not merge from a module into a site, so
+the base cannot simply set them. Tested on Hugo 0.166.0:
+
+- A **project level** `_merge = "deep"`, either at the root or on a category,
+  does pull that category's values from an imported module.
+- `_merge` declared **inside the module** has no effect. Only the project's own
+  config counts, which is why each site carries the opt in.
+
+What that means in practice:
+
+| Category | Reaches a site | A site should |
+|---|---|---|
+| `params`, `menus`, `mediaTypes`, `outputFormats` | automatically | nothing |
+| `markup`, `imaging`, `services` | only with an opt in | add `_merge = "deep"` to inherit the base's defaults |
+| `outputs`, `sitemap`, `taxonomies`, `pagination` | only with an opt in | set its own: the base contributes nothing here, because Hugo's defaults already match |
+| root keys (`baseURL`, `title`, `locale`, `enableRobotsTXT`, `disableHugoGeneratorInject`) | never | always set them itself |
+
+So a consuming site's config needs these three files, each one line:
+
+```toml
+# config/_default/markup.toml
+_merge = "deep"
+# config/_default/imaging.toml
+_merge = "deep"
+# config/_default/services.toml
+_merge = "deep"
+```
+
+The opt in is enumerated per category rather than a single root `_merge`, so a
+later base release cannot start contributing to a category (`security`,
+`build`, `privacy`) without that showing up as a deliberate change.
+
+What the base contributes, and why each default is worth changing:
+
+- **markup**: class based syntax highlighting (Chroma's inline hex ignores the
+  tokens and fails contrast), GitHub style heading anchors, a table of contents
+  from h2 to h3, raw HTML left escaped, and typographer dash substitutions
+  mapped to themselves so `--` and `---` stay as the author typed them.
+- **imaging**: CatmullRom resampling (sharper downscaling than Hugo's default
+  box) and per format quality.
+- **services**: a feed limit of 50, where Hugo's default is unlimited.
+
+## Feeds, sitemap and robots
+
+- RSS and the sitemap use Hugo's embedded templates. The feed carries full page
+  content and is limited to 50 items.
+- A page with `noindex: true` in front matter should also set
+  `sitemap.disable: true`. The gate fails when it does not.
+- `layouts/robots.txt` allows everything on a production build and disallows
+  everything otherwise, so Netlify deploy previews cannot be indexed. It needs
+  `enableRobotsTXT = true` in the site config, because root keys cannot come
+  from a module.
+
 ## Quality gate
 
 ```sh

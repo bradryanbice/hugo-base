@@ -1,8 +1,18 @@
-# Module configuration for hugo-base.
+# Module configuration for hugo-base, and the defaults it contributes.
 #
-# Keep this file small. Most configuration categories do not merge from a
-# module into the consuming site (only params, menus, mediaTypes and
-# outputFormats do), so site configuration belongs in each site.
+# Most configuration categories do not merge from a module into a site, so a
+# site opts in per category:
+#
+#   [markup]
+#     _merge = "deep"
+#
+# Tested on Hugo 0.166.0: a project level _merge does pull these values from an
+# imported module, and _merge declared here in the module has no effect. See the
+# config contract in the README.
+#
+# Only categories with a default worth changing are here. Hugo's own defaults
+# for outputs and sitemap already match what the base would set, so it
+# contributes nothing for them and a site needs no opt in.
 #
 # Do not add module.mounts here. Declaring any mount removes every default
 # mount for this module.
@@ -10,3 +20,51 @@
 [module.hugoVersion]
   # The lowest Hugo version CI has tested. Raise it deliberately.
   min = "0.166.0"
+
+[markup]
+  [markup.goldmark.renderer]
+    # Raw HTML in content stays escaped. A site that needs it turns it on
+    # knowing that content then has to be trusted.
+    unsafe = false
+
+  [markup.goldmark.parser]
+    # Heading anchors, in the style GitHub uses, so links to headings survive
+    # being copied between tools.
+    autoHeadingID = true
+    autoHeadingIDType = "github"
+
+  [markup.goldmark.extensions.typographer]
+    # Smart quotes and ellipses are welcome. The dash substitutions are not:
+    # Hugo would turn "--" into an en dash and "---" into an em dash, which
+    # the project's writing style rules out. Mapping each to itself keeps the
+    # characters the author typed.
+    endash = "--"
+    emdash = "---"
+
+  [markup.highlight]
+    # Classes, not inline hex colors. Chroma's built in styles are hardcoded
+    # hex, which ignores the token system, fails contrast on our surfaces and
+    # cannot follow dark mode. The base styles the classes instead.
+    noClasses = false
+    lineNumbersInTable = true
+    tabWidth = 2
+
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+
+[imaging]
+  # Box is fast but soft when downscaling photographs. CatmullRom is sharper
+  # for a small build time cost, and build time is cached.
+  resampleFilter = "CatmullRom"
+
+  [imaging.jpeg]
+    quality = 78
+
+  [imaging.webp]
+    quality = 80
+
+[services]
+  [services.rss]
+    # Unlimited by default, which grows forever on a site with an archive.
+    limit = 50

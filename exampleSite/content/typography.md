@@ -25,6 +25,14 @@ Short paragraph after a third level heading.
 Text under a fourth level heading, with **bold**, *italic*, `inline code`, and
 a longer run of `code_with_an_extremely_long_identifier_that_must_wrap_rather_than_scroll`.
 
+## Punctuation
+
+Hugo's typographer would normally turn two hyphens into an en dash and three
+into an em dash. The base maps both back to themselves, so dash handling leaves
+what an author typed alone: ranges like 10--20 stay as typed, and so does a
+parenthetical --- like this one. Smart quotes still apply, as does an
+ellipsis...
+
 ## Lists
 
 An unordered list:

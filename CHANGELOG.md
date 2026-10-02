@@ -28,6 +28,10 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Config contract established by experiment on Hugo 0.166.0: a project level `_merge = "deep"` does pull `markup`, `imaging` and `services` values from an imported module, while `_merge` declared inside the module has no effect. The base now contributes defaults for those three categories and documents what every site must still set itself.
+- Markup defaults: class based syntax highlighting, GitHub style heading anchors, a table of contents from h2 to h3, raw HTML left escaped, and typographer dash substitutions mapped to themselves so `--` and `---` survive as typed.
+- Imaging defaults: CatmullRom resampling and per format quality. Feed limit of 50.
+- `layouts/robots.txt`: allows everything on a production build, disallows everything otherwise, so deploy previews cannot be indexed.
 - Document head built from replaceable partials: core meta with a description fallback chain, canonical and translation alternates, Open Graph and X cards via Hugo's embedded templates, feed discovery driven by the page's own output formats, an icons seam, and JSON-LD.
 - JSON-LD structured data: `WebSite` on the home page, `Article` or `WebPage` on single pages, `CollectionPage` on lists, and a `BreadcrumbList` from the section ancestry. Publisher and author come from `params.base.schema`, with no invented defaults.
 - Front matter `noindex` support, paired with `sitemap.disable`.

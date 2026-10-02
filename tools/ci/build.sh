@@ -7,6 +7,9 @@
 # becomes a WARN, so --panicOnWarning alone would catch it late. This script
 # builds at INFO level and fails if the log mentions a deprecation, which turns
 # a future Hugo bump red as soon as a deprecation appears.
+#
+# It also fails on an unused template or a duplicate output path, both of which
+# Hugo reports as warnings under the flags below.
 
 set -euo pipefail
 
@@ -17,11 +20,17 @@ log=$(mktemp)
 trap 'rm -f "$log"' EXIT
 
 set +e
+# --printUnusedTemplates turns template coverage into a build failure: a
+# template nothing renders is a template CI cannot vouch for, and a Hugo
+# upgrade could break it silently in a consuming site. --printPathWarnings
+# catches two pages claiming the same output path.
 hugo build \
   --source "$source_dir" \
   --gc \
   --minify \
   --panicOnWarning \
+  --printUnusedTemplates \
+  --printPathWarnings \
   --logLevel info \
   "$@" 2>&1 | tee "$log"
 build_status=${PIPESTATUS[0]}

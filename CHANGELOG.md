@@ -28,6 +28,10 @@ release may contain breaking changes, listed under a Breaking heading.
 - `head/css.html` bundles the stylesheet with `css.Build` and fingerprints it with an integrity hash in production. `head/css-site.html` is an empty seam for a site's own stylesheet.
 - Typography: element styles for headings, prose, links, lists, quotes, code, tables and inline semantics, driven by the type scale and the theme's font inputs, plus a `.prose` wrapper that sets the reading measure and vertical rhythm.
 - Syntax highlighting themed from semantic tokens, so it works in both color schemes and meets contrast. Sites need `[markup.highlight] noClasses = false`.
+- Archetypes: `default.md` and a `bundle` kind for a page with images, both with the front matter the base expects and a note on what to fill in.
+- Template coverage is now enforced: the build runs with `--printUnusedTemplates` and `--printPathWarnings` under `--panicOnWarning`, so a template nothing renders fails CI rather than going untested.
+- `tools/ci/check-harness.sh` asserts exampleSite still exercises every override path (theme inputs, a hook, a partial, a section layout) and the behaviour fixtures (noindex, images, shortcodes, pagination, drafts staying unpublished).
+- Goldmark's task list extension is off: Hugo renders it as an unlabelled checkbox, which fails WCAG, and neither CSS nor a render hook can fix it. Tracked for revisiting.
 - Shortcodes: `figure` (through the image pipeline, accepting Hugo's embedded figure parameters including `attr`), `callout` (note, tip, warning, danger, each stating its type as text), and `table` (a caption that also names the scroll region).
 - `_markup/render-table.html` wraps every Markdown table in a keyboard reachable scroll region with an accessible name, so a wide table is not unreachable content, and applies cell alignment as a data attribute rather than an inline style.
 - Callout and table components, adjustable through component level custom properties.

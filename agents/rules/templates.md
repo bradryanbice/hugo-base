@@ -142,4 +142,7 @@ paths.
 ## Build discipline
 
 - The build runs with `--panicOnWarning`, so a `warnf` fails CI. Fix the cause.
-- Any template a site adds must be exercised by a page, or it is untested.
+- Any template a site adds must be exercised by a page, or it is untested. The
+  build runs with `--printUnusedTemplates`, so a template nothing renders fails
+  CI. That is deliberate: an unrendered template is one a Hugo upgrade can
+  break without anyone noticing.

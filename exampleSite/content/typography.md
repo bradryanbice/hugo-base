@@ -79,6 +79,16 @@ bash tools/quality/run.sh exampleSite/public
 | `--space-0h` | 0.25rem | the only half step |
 | `--text-base` | clamp | fluid between two rem bounds |
 
+## Footnotes and task lists
+
+A footnote reference[^1] renders as a link to a list at the end of the page.
+
+[^1]: The footnote body, which can contain [a link](/about/).
+
+Task lists are deliberately off: Hugo renders them as unlabelled checkboxes,
+which fails WCAG, so a literal `- [x]` stays literal. Write the state in words
+instead.
+
 ## A horizontal rule
 
 ---

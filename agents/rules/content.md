@@ -40,6 +40,12 @@ This file is managed by hugo-base. Do not edit it inside a site.
   default; add `"avif"` to `formats` to opt in, at the cost of build time on
   every width.
 
+## What is not supported
+
+Task lists (`- [x] done`) are off. Hugo renders them as a checkbox with no
+accessible name, which fails WCAG, and neither CSS nor a render hook can add
+one. Write the state in words instead, or use a definition list.
+
 ## Shortcodes
 
 The base ships `figure`, `callout` and `table`. Prefer them over raw HTML:

@@ -8,8 +8,8 @@
 # builds at INFO level and fails if the log mentions a deprecation, which turns
 # a future Hugo bump red as soon as a deprecation appears.
 #
-# It also fails on an unused template or a duplicate output path, both of which
-# Hugo reports as warnings under the flags below.
+# It also fails on a duplicate output path, and, when
+# HUGO_BASE_TEMPLATE_COVERAGE=1, on a template nothing renders.
 
 set -euo pipefail
 
@@ -20,16 +20,26 @@ log=$(mktemp)
 trap 'rm -f "$log"' EXIT
 
 set +e
-# --printUnusedTemplates turns template coverage into a build failure: a
-# template nothing renders is a template CI cannot vouch for, and a Hugo
-# upgrade could break it silently in a consuming site. --printPathWarnings
-# catches two pages claiming the same output path.
+# Template coverage is only meaningful for hugo-base's own harness, where every
+# template the module ships must be exercised or CI cannot vouch for it. In a
+# consuming site an unused base template is normal: a site with no images does
+# not render the image hook, and failing its build for that would be absurd.
+# So it is opt in, via HUGO_BASE_TEMPLATE_COVERAGE=1.
+#
+# --printPathWarnings stays on everywhere: two pages claiming one output path
+# is a real error in any site.
+coverage_flags=""
+if [ "${HUGO_BASE_TEMPLATE_COVERAGE:-0}" = "1" ]; then
+  coverage_flags="--printUnusedTemplates"
+fi
+
+# shellcheck disable=SC2086
 hugo build \
   --source "$source_dir" \
   --gc \
   --minify \
   --panicOnWarning \
-  --printUnusedTemplates \
+  $coverage_flags \
   --printPathWarnings \
   --logLevel info \
   "$@" 2>&1 | tee "$log"

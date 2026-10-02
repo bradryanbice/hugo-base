@@ -17,6 +17,14 @@ internal.
 
 Nothing yet.
 
+## v0.1.2 (2026-10-02)
+
+No migration needed.
+
+### Fixed
+
+- A consuming site's build failed on the base's own unused templates. Template coverage (`--printUnusedTemplates` under `--panicOnWarning`) was on for every site, so a site with no images failed because it never renders the image render hook. That check belongs to hugo-base's harness, where every shipped template must be exercised, not to a site, which legitimately uses only part of the base. It is now opt in through the shared workflow's `template-coverage` input. Found by the v0.1.1 smoke test.
+
 ## v0.1.1 (2026-10-02)
 
 No migration needed.

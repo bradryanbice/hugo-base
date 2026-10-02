@@ -31,6 +31,13 @@ on:
           Defaults to the site itself. hugo-base passes its own root too.
         type: string
         default: ""
+      template-coverage:
+        description: >
+          Fail the build when a template nothing renders is found. Correct for
+          hugo-base, wrong for a site: a site that has no images does not
+          render the image hook, and that is not an error.
+        type: boolean
+        default: false
       harness-check:
         description: >
           Assert hugo-base's own harness still exercises every override path.
@@ -106,6 +113,7 @@ jobs:
       - name: Build
         env:
           HUGO_CACHEDIR: ${{ runner.temp }}/hugo_cache
+          HUGO_BASE_TEMPLATE_COVERAGE: ${{ inputs.template-coverage && '1' || '0' }}
         run: bash "${{ steps.base.outputs.dir }}/tools/ci/build.sh" "$SOURCE"
 
       - name: Upload built site

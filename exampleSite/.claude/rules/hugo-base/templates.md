@@ -142,7 +142,8 @@ paths.
 ## Build discipline
 
 - The build runs with `--panicOnWarning`, so a `warnf` fails CI. Fix the cause.
-- Any template a site adds must be exercised by a page, or it is untested. The
-  build runs with `--printUnusedTemplates`, so a template nothing renders fails
-  CI. That is deliberate: an unrendered template is one a Hugo upgrade can
-  break without anyone noticing.
+- Any template a site adds should be exercised by a page, or it is untested: an
+  unrendered template is one a Hugo upgrade can break without anyone noticing.
+  A site can enforce that by passing `template-coverage: true` to the shared
+  workflow, but it is off by default, because a site legitimately does not use
+  every template the base ships.

@@ -30,6 +30,7 @@ jobs:
       lint-dirs: ". exampleSite"
       lint-self-test: true
       harness-check: true
+      template-coverage: true
 
   renovate-config:
     name: Renovate config

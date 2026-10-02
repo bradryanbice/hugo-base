@@ -6,6 +6,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Manual runs, for re-running the gate on an unchanged tree. Worth having:
+  # the only way to build confidence that a flaky check is fixed is to run it
+  # again without changing anything.
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

@@ -5,10 +5,10 @@ Usage: python3 tools/quality/check-head.py <path to built site>
 
 Static checks, so they are cheap and need no browser. For every HTML page:
 
-  exactly one <title>, and it is not empty
-  exactly one canonical link
-  a meta description
-  exactly one <h1>
+  exactly one <title> in <head>, and it is not empty
+  exactly one canonical link in <head>
+  a meta description in <head>
+  exactly one <h1> in the document
   every JSON-LD block parses as JSON and has @context and @type
   a page with noindex is not listed in sitemap.xml
 
@@ -37,6 +37,7 @@ NOINDEX = re.compile(r"""<meta[^>]+name=["']?robots["']?[^>]*noindex""", re.I)
 # stubs. They have no head of their own and no content, so the contract does
 # not apply to them.
 ALIAS = re.compile(r"""<meta[^>]+http-equiv=["']?refresh["']?""", re.I)
+HEAD_END = re.compile(r"</head>", re.I)
 
 
 def main() -> int:
@@ -59,16 +60,22 @@ def main() -> int:
             continue
         checked += 1
 
-        titles = [t.strip() for t in TITLE.findall(html)]
+        # Scope the head checks to the head. An inline SVG carries its own
+        # <title> as its accessible name, which is correct practice, and
+        # counting those reported a duplicate title on every page with a logo.
+        end = HEAD_END.search(html)
+        head = html[: end.start()] if end else html
+
+        titles = [t.strip() for t in TITLE.findall(head)]
         if len(titles) != 1 or not titles[0]:
             problems.append(f"{rel}: expected one non-empty <title>, found {len(titles)}")
 
         if not is_404:
-            canonicals = CANONICAL.findall(html)
+            canonicals = CANONICAL.findall(head)
             if len(canonicals) != 1:
                 problems.append(f"{rel}: expected one canonical link, found {len(canonicals)}")
 
-        if not DESCRIPTION.search(html):
+        if not DESCRIPTION.search(head):
             problems.append(f"{rel}: no meta description")
 
         h1s = H1.findall(html)
@@ -93,7 +100,7 @@ def main() -> int:
                     problems.append(f"{rel}: JSON-LD is missing {key}")
 
         # A page kept out of search results should not be advertised either.
-        if NOINDEX.search(html) and sitemap:
+        if NOINDEX.search(head) and sitemap:
             url_path = "/" + str(rel.parent).replace(".", "").strip("/")
             if url_path != "/":
                 url_path += "/"

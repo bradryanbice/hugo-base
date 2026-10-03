@@ -5,6 +5,7 @@
   "description": "CSS policy lint for hugo-base and the sites that consume it. CI and dev tooling only: it never touches a site build.",
   "type": "module",
   "devDependencies": {
+    "postcss-scss": "4.0.9",
     "stylelint": "17.16.0",
     "stylelint-declaration-strict-value": "1.12.1",
     "stylelint-use-logical": "2.1.3"

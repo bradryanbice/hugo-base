@@ -116,13 +116,40 @@ pair in the token contract, in light and in dark mode. A pair that falls below
 token that does not resolve. So a brand color that breaks contrast cannot ship,
 and neither can a theme that leaves a token invalid.
 
-## Modern CSS, no tooling
+## Modern CSS, and what a site may use
 
 - Cascade layers, nesting, custom properties, container queries, `:has()` and
   relative color syntax are all expected to work natively. No fallbacks.
 - Layer order is declared once in `main.css`:
   `@layer reset, tokens, foundation, layout, components, utilities;`
-- No CSS framework, no Sass, no PostCSS, no npm step for site assets. The only
-  pipeline is Hugo Pipes with `css.Build`, then `fingerprint` in production.
 - No `!important` in shared CSS. The one exception in the base is `[hidden]`,
   which must always win.
+- No CSS framework.
+
+**The foundation is plain CSS.** hugo-base uses no Sass, no PostCSS and no npm
+step: Hugo Pipes with `css.Build`, then `fingerprint` in production. That is not
+negotiable for the base, because its colour system depends on values the browser
+resolves (`oklch(from var(--token) ...)`), and a preprocessor variable is gone
+before the browser sees it.
+
+**A site may write its own styles in Sass.** Plenty of sites have years of it,
+and the rest of the base is worth adopting long before that gets converted. Two
+things follow:
+
+- The policy still applies. Colour is still `oklch()`, spacing still comes from
+  tokens, and the lint checks `.scss` as well as `.css`. A Sass variable counts
+  as a variable, so `$space-m` passes and a raw `12px` does not.
+- A Sass variable cannot hold a value the token system derives from. Anything
+  the base computes (ramps, hover and active states, dark mode) has to stay a
+  custom property. Mixing is fine: keep layout and components in Sass, move
+  colour to the tokens.
+
+A site part way through this can exempt paths in `.hugo-base-lint-ignore`, one
+glob per line with a reason after a `#`:
+
+```
+assets/scss/**   # legacy Sass predating hugo-base, conversion tracked in #12
+```
+
+Exemptions are printed on every lint run. That is deliberate: an unchecked path
+should stay visible rather than quietly becoming the way things are.

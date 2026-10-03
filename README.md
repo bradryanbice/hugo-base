@@ -155,6 +155,11 @@ missing, and that is an issue here.
 **Shortcodes**: `figure`, `callout`, `table`. **Render hooks**: images and
 tables. **i18n keys**: every user visible string, in `i18n/en.toml`.
 
+A site may write its own styles in Sass if it already does. The foundation
+stays plain CSS, and the policy lint covers `.scss` as well, so colour and
+spacing rules apply either way. Paths can be exempted during a migration in
+`.hugo-base-lint-ignore`, with a reason, and the exemptions print on every run.
+
 Foundation CSS is **not** replaceable: `main.css`, `tokens/scale.css`,
 `tokens/color.css`, `tokens/semantic.css`, `foundation/**` and
 `layout/primitives.css` must not be copied into a site, and the lint fails if

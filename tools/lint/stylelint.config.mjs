@@ -102,4 +102,20 @@ export default {
     "at-rule-disallowed-list": ["import"],
   },
   plugins: ["stylelint-declaration-strict-value", "stylelint-use-logical"],
+  overrides: [
+    {
+      // A site may write its own styles in Sass. The policy still applies:
+      // colour is still OKLCH, spacing still comes from tokens. Sass variables
+      // count as variables to the strict value rule, so $spacing-m passes and
+      // a raw 12px does not.
+      files: ["**/*.scss"],
+      customSyntax: "postcss-scss",
+      rules: {
+        // Sass's own @use, @forward and @include are not CSS at-rules, and
+        // @import is Sass's deprecated include, not the CSS one this rule is
+        // about.
+        "at-rule-disallowed-list": null,
+      },
+    },
+  ],
 };

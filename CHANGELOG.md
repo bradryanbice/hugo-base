@@ -17,6 +17,18 @@ internal.
 
 Nothing yet.
 
+## v0.2.0 (2026-10-03)
+
+Migration: [`migrations/v0.2.0.md`](migrations/v0.2.0.md).
+
+### Breaking
+
+- The CSS policy lint now covers `.scss` as well as `.css`. A site writing Sass was silently exempt from the colour and spacing rules; run against a real site for the first time, the policy found 539 violations in 3,148 lines that had never been checked. A site not ready to convert exempts paths in a new `.hugo-base-lint-ignore`, with a reason, and the exemptions print on every run.
+
+### Changed
+
+- A consuming site may now write its own styles in Sass. The rule used to forbid it everywhere, which blocked adoption for sites with years of it, for no benefit: the head, shell, image pipeline and checks are worth having long before styles are converted. The foundation itself remains plain CSS, because its colour system depends on values the browser resolves.
+
 ## v0.1.3 (2026-10-02)
 
 No migration needed.

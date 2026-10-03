@@ -8,9 +8,17 @@
 #   fire, which proves the lint is doing something.
 #
 # Three checks per directory:
-#   1. stylelint, with the policy config next to this script
+#   1. stylelint over the site's styles, CSS and Sass alike
 #   2. no site file shadows a hugo-base foundation file
 #   3. no file outside tokens/ reads a primitive ramp step directly
+#
+# A site may write its own styles in Sass. The policy still applies to them,
+# which is why .scss is linted rather than ignored: colour is still OKLCH and
+# spacing still comes from tokens, whatever compiles them.
+#
+# A site part way through adopting can exempt paths in .hugo-base-lint-ignore,
+# one glob per line with a reason after a #. Exemptions are printed on every
+# run, so an unchecked path stays visible rather than becoming the status quo.
 #
 # Node comes from mise. Hugo and Chrome are not needed.
 # Written for bash 3.2 so it behaves the same on macOS.
@@ -66,12 +74,34 @@ for dir in $dirs; do
   echo
   echo "== $name"
 
-  css_count=$(find "$dir/assets/css" -name '*.css' -type f 2>/dev/null | wc -l | tr -d ' ')
-  if [ "$css_count" = "0" ]; then
-    echo "no CSS to lint"
+  # Exemptions, printed so they cannot quietly become permanent.
+  ignore_file="$dir/.hugo-base-lint-ignore"
+  ignore_args=""
+  if [ -f "$ignore_file" ]; then
+    echo "exemptions from .hugo-base-lint-ignore:"
+    while IFS= read -r line; do
+      case "$line" in
+        ""|\#*) continue ;;
+      esac
+      pattern=${line%%#*}
+      reason=${line#*#}
+      pattern=$(echo "$pattern" | tr -d ' ')
+      [ -n "$pattern" ] || continue
+      echo "  $pattern  ($(echo "$reason" | sed 's/^ *//'))"
+      ignore_args="$ignore_args --ignore-pattern $pattern"
+    done < "$ignore_file"
+  fi
+
+  style_count=$(find "$dir/assets" \( -name '*.css' -o -name '*.scss' \) -type f 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$style_count" = "0" ]; then
+    echo "no styles to lint"
   else
-    echo "stylelint: $css_count file(s)"
-    if ! stylelint_in "$dir" "assets/css/**/*.css"; then
+    echo "stylelint: $style_count file(s), CSS and Sass"
+    # shellcheck disable=SC2086
+    # --allow-empty-input: a site that has exempted everything, or has no styles
+    # of its own yet, is not an error. The exemptions are printed above either
+    # way, which is the point.
+    if ! stylelint_in "$dir" --allow-empty-input $ignore_args "assets/**/*.css" "assets/**/*.scss"; then
       echo "::error::stylelint failed in $name" >&2
       status=1
     fi
@@ -121,7 +151,7 @@ if [ "$self_test" = "yes" ]; then
   cp -R "$here/fixtures" "$workdir"/
   # stylelint writes its report to stderr when the run errored, so both streams
   # are captured. Reading only stdout here would make this test always pass.
-  report=$(stylelint_in "$workdir" --formatter json "fixtures/violations.css" 2>&1 || true)
+  report=$(stylelint_in "$workdir" --formatter json "fixtures/violations.css" "fixtures/violations.scss" 2>&1 || true)
   for rule in \
     color-no-hex \
     color-named \
@@ -132,12 +162,21 @@ if [ "$self_test" = "yes" ]; then
     csstools/use-logical
   do
     if printf '%s' "$report" | grep -q "\"$rule\""; then
-      echo "ok   $rule fired on the fixture"
+      echo "ok   $rule fired on the fixtures"
     else
-      echo "::error::$rule did not fire on fixtures/violations.css, so the lint is not enforcing it" >&2
+      echo "::error::$rule did not fire on the fixtures, so the lint is not enforcing it" >&2
       status=1
     fi
   done
+
+  # And specifically that Sass is covered: a site writing .scss must not be
+  # silently exempt from the policy.
+  if printf '%s' "$report" | grep -q "violations.scss"; then
+    echo "ok   the policy fires on .scss as well as .css"
+  else
+    echo "::error::no finding in fixtures/violations.scss: Sass is not being linted" >&2
+    status=1
+  fi
 fi
 
 echo

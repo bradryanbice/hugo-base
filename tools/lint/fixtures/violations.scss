@@ -1,0 +1,35 @@
+// Deliberately broken Sass. The lint self test requires the policy to fire on
+// .scss as well as .css: a site writing Sass must not be silently exempt from
+// the colour and spacing rules.
+//
+// Do not fix anything here.
+
+$brand: #336699; // color-no-hex: a hex is a hex, even in a variable
+
+@mixin card {
+  // scale-unlimited/declaration-strict-value: a raw length, not a token
+  padding: 12px;
+}
+
+.fixture {
+  @include card;
+
+  // color-no-hex
+  border-block-end-color: #333;
+
+  // function-disallowed-list
+  background-color: rgb(0 0 0);
+
+  // declaration-no-important
+  margin-block: var(--space-2) !important;
+
+  // declaration-property-value-disallowed-list
+  outline: none;
+
+  // csstools/use-logical
+  margin-left: var(--space-2);
+
+  // A Sass variable is a variable, so this passes the strict value rule and is
+  // caught by color-no-hex at the declaration above instead.
+  color: $brand;
+}

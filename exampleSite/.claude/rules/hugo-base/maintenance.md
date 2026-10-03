@@ -75,6 +75,21 @@ Read the hugo-base `CHANGELOG.md` for the versions you are crossing. A release
 with a migration note needs those steps applied: run the `hugo-base-upgrade`
 skill, or follow the notes by hand.
 
+## The migration notice
+
+A pull request that changes the pinned hugo-base version gets a comment listing
+the migrations it crosses, if the repository allows workflows to write to pull
+requests. Many repositories cap the token at read, in which case the notice
+appears in the build log instead and nothing fails. To let it post:
+
+```sh
+gh api -X PUT repos/<owner>/<repo>/actions/permissions/workflow \
+  -f default_workflow_permissions=write
+```
+
+Either way the gate itself still fails when a migration has not been applied,
+so the comment is a convenience rather than the safety net.
+
 ## A Renovate pull request
 
 1. Let CI run. The gate builds the site, checks the toolchain pins, runs axe

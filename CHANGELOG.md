@@ -15,7 +15,9 @@ internal.
 
 ## Unreleased
 
-Nothing yet.
+### Fixed
+
+- The migration notice silently did not post on a repository whose Actions setting caps workflow tokens at read. It degraded as designed, logging instead of failing, but nothing said why no comment appeared. The caller template and the maintenance rules now explain it, with the command to allow it.
 
 ## v0.2.0 (2026-10-03)
 

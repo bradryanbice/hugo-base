@@ -17,6 +17,14 @@ internal.
 
 Nothing yet.
 
+## v0.1.3 (2026-10-02)
+
+No migration needed.
+
+### Fixed
+
+- The head contract check reported a duplicate `<title>` on any page containing an inline SVG. An SVG carries its own `<title>` as its accessible name, which is correct practice, and the check was counting those. It now scopes the title, canonical, description and robots checks to `<head>`. exampleSite had no inline SVG, so the harness could not see this; a real site reported 115 false findings. The logo seam in exampleSite now ships one, so the fixture exists.
+
 ## v0.1.2 (2026-10-02)
 
 No migration needed.

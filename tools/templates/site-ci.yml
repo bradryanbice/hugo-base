@@ -18,7 +18,19 @@ concurrency:
 permissions:
   contents: read
   # So the gate can post a notice listing the migrations a hugo-base bump
-  # crosses. Without it the notice is logged and nothing else changes.
+  # crosses.
+  #
+  # This asks, it does not guarantee. A repository whose Actions setting is
+  # "read repository contents" caps the token at read, and the request here
+  # cannot exceed that cap, so the notice is logged instead of posted. Nothing
+  # fails either way. To let it post:
+  #
+  #   gh api -X PUT repos/<owner>/<repo>/actions/permissions/workflow \
+  #     -f default_workflow_permissions=write
+  #
+  # Leaving it read only is a reasonable choice: the notice is in the log, and
+  # the build, lint and managed file checks fail on their own when a migration
+  # has not been applied.
   pull-requests: write
 
 jobs:
